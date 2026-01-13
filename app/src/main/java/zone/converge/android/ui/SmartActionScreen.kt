@@ -226,7 +226,7 @@ fun PrimaryActionCard(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     LinearProgressIndicator(
-                        progress = { prediction.confidence },
+                        progress = prediction.confidence,
                         modifier = Modifier
                             .weight(1f)
                             .height(4.dp)

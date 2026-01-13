@@ -74,9 +74,7 @@ data class Artifact(
     override fun hashCode() = id.hashCode()
 }
 
-enum class ArtifactType {
-    REPORT, ANALYSIS, DECISION, DATA_EXPORT, VISUALIZATION, NOTIFICATION
-}
+// ArtifactType is defined in DomainKnowledgeBase.kt
 
 /**
  * Actions are the atomic operations a user can perform.
