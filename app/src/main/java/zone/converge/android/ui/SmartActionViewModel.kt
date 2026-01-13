@@ -82,19 +82,19 @@ class SmartActionViewModel(
             try {
                 // TODO: Actually submit job to converge-runtime
                 // For now, record completion and refresh
-                jtbdPredictor.recordCompletion(jtbd.id, jtbd.producesArtifacts.toSet())
+                jtbdPredictor.recordCompletion(jtbd.id, jtbd.producedArtifacts.toSet())
 
                 // Update context
                 val currentContext = _domainContext.value
                 _domainContext.value = currentContext.copy(
                     completedJtbds = currentContext.completedJtbds + jtbd.id,
-                    recentlyProducedArtifacts = jtbd.producesArtifacts.toSet(),
+                    recentlyProducedArtifacts = jtbd.producedArtifacts.toSet(),
                 )
 
                 // Add to activity
                 val activity = ActivityRecord(
                     id = "activity-${System.currentTimeMillis()}",
-                    title = jtbd.title,
+                    title = jtbd.name,
                     subtitle = jtbd.outcome,
                     type = ActivityType.JOB_COMPLETED,
                     timeAgo = "Just now",

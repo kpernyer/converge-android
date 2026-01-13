@@ -442,12 +442,12 @@ data class PredictedAction(
 data class UserContext(
     val activeJobs: List<Job>,
     val pendingDecisions: List<Decision>,
-    val newArtifacts: List<Artifact>,
-    val exportableArtifacts: List<Artifact>,
+    val newArtifacts: List<ArtifactInstance>,
+    val exportableArtifacts: List<ArtifactInstance>,
     val recentActions: List<Action>,
     val lastActionTime: Instant?,
     val unreadNotifications: Int,
-    val frequentPacks: List<Pack>,
+    val frequentPacks: List<DomainPack>,
     val suggestedTemplates: List<Template>,
 )
 

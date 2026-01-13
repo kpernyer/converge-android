@@ -99,7 +99,7 @@ class JTBDPredictor(
 
         // Strategy 5: Onboarding suggestions for new users
         if (predictions.isEmpty()) {
-            val starterJtbds = listOf("capture-lead", "issue-invoice", "post-job")
+            val starterJtbds = listOf("jtbd-capture-lead", "jtbd-issue-invoice", "jtbd-onboard-person")
             starterJtbds.mapNotNull { DomainKnowledgeBase.getJTBD(it) }.forEach { jtbd ->
                 predictions.add(
                     JTBDPrediction(
@@ -147,7 +147,7 @@ class JTBDPredictor(
         val topPack = outcomeTracker.getTopPack()
         if (topPack != null) {
             DomainKnowledgeBase.blueprints
-                .filter { topPack in it.packs && it.id !in context.activeBlueprints.keys }
+                .filter { topPack in it.packIds && it.id !in context.activeBlueprints.keys }
                 .filter { bp -> suggestions.none { it.blueprint.id == bp.id } }
                 .forEach { blueprint ->
                     suggestions.add(

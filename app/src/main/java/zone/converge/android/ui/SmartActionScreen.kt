@@ -28,6 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import zone.converge.android.data.*
 import zone.converge.android.ml.*
+import zone.converge.android.ui.theme.ConvergeColors
+import zone.converge.android.ui.theme.ConvergeSpacing
 
 /**
  * Smart Action Screen - The main UI that shows the most likely action prominently.
@@ -156,15 +158,16 @@ fun PrimaryActionCard(
     prediction: JTBDPrediction,
     onClick: () -> Unit,
 ) {
+    // Use theme colors for pack gradients
     val packColors = mapOf(
-        "money" to listOf(Color(0xFF2E7D32), Color(0xFF4CAF50)),
-        "customers" to listOf(Color(0xFF1565C0), Color(0xFF42A5F5)),
-        "delivery" to listOf(Color(0xFFE65100), Color(0xFFFF9800)),
-        "people" to listOf(Color(0xFF6A1B9A), Color(0xFFAB47BC)),
-        "trust" to listOf(Color(0xFF00695C), Color(0xFF26A69A)),
+        "pack-money" to listOf(ConvergeColors.PackMoney, ConvergeColors.PackMoney.copy(alpha = 0.7f)),
+        "pack-customers" to listOf(ConvergeColors.PackCustomers, ConvergeColors.PackCustomers.copy(alpha = 0.7f)),
+        "pack-delivery" to listOf(ConvergeColors.PackDelivery, ConvergeColors.PackDelivery.copy(alpha = 0.7f)),
+        "pack-people" to listOf(ConvergeColors.PackPeople, ConvergeColors.PackPeople.copy(alpha = 0.7f)),
+        "pack-trust" to listOf(ConvergeColors.PackTrust, ConvergeColors.PackTrust.copy(alpha = 0.7f)),
     )
 
-    val colors = packColors[prediction.jtbd.packId] ?: listOf(Color(0xFF424242), Color(0xFF757575))
+    val colors = packColors[prediction.jtbd.packId] ?: listOf(ConvergeColors.Ink, ConvergeColors.InkSecondary)
 
     Card(
         modifier = Modifier
@@ -207,7 +210,7 @@ fun PrimaryActionCard(
                 // Title and outcome
                 Column {
                     Text(
-                        prediction.jtbd.title,
+                        prediction.jtbd.name,
                         color = Color.White,
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
@@ -285,7 +288,7 @@ fun QuickActionChip(
                 modifier = Modifier.size(20.dp),
             )
             Text(
-                prediction.jtbd.title,
+                prediction.jtbd.name,
                 style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.Medium,
                 maxLines = 2,
@@ -448,11 +451,11 @@ fun EmptyStateCard() {
 
 // Helper functions
 fun getPackIcon(packId: String): ImageVector = when (packId) {
-    "money" -> Icons.Default.AttachMoney
-    "customers" -> Icons.Default.People
-    "delivery" -> Icons.Default.LocalShipping
-    "people" -> Icons.Default.Badge
-    "trust" -> Icons.Default.VerifiedUser
+    "pack-money" -> Icons.Default.AttachMoney
+    "pack-customers" -> Icons.Default.People
+    "pack-delivery" -> Icons.Default.LocalShipping
+    "pack-people" -> Icons.Default.Badge
+    "pack-trust" -> Icons.Default.VerifiedUser
     else -> Icons.Default.Category
 }
 

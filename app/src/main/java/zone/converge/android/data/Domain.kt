@@ -6,15 +6,15 @@ package zone.converge.android.data
 import java.time.Instant
 
 /**
- * Jobs To Be Done - represents what the user is trying to accomplish.
- * JTBD focus on outcomes, not features.
+ * Runtime Job - an instance of work being executed.
+ * This represents a running job, not a JTBD.
  */
 data class Job(
     val id: String,
     val title: String,
     val outcome: String,
-    val pack: Pack,
-    val flows: List<Flow>,
+    val packId: String,
+    val jtbdId: String,
     val priority: Priority = Priority.NORMAL,
     val status: JobStatus = JobStatus.PENDING,
     val createdAt: Instant = Instant.now(),
@@ -24,34 +24,8 @@ enum class Priority { LOW, NORMAL, HIGH, URGENT }
 enum class JobStatus { PENDING, IN_PROGRESS, BLOCKED, COMPLETED, CANCELLED }
 
 /**
- * A Flow is a sequence of steps to complete a Job.
+ * Template for starting jobs.
  */
-data class Flow(
-    val id: String,
-    val name: String,
-    val steps: List<FlowStep>,
-    val requiredArtifacts: List<ArtifactType>,
-    val producedArtifacts: List<ArtifactType>,
-)
-
-data class FlowStep(
-    val id: String,
-    val name: String,
-    val action: Action,
-    val optional: Boolean = false,
-)
-
-/**
- * Packs are domain modules (e.g., Growth Strategy, SDR Pipeline).
- */
-data class Pack(
-    val id: String,
-    val name: String,
-    val description: String,
-    val templates: List<Template>,
-    val invariants: List<String>,
-)
-
 data class Template(
     val id: String,
     val name: String,
@@ -60,17 +34,18 @@ data class Template(
 )
 
 /**
- * Artifacts are outputs from flows (reports, data, decisions).
+ * Artifact instance - a concrete output from a job.
  */
-data class Artifact(
+data class ArtifactInstance(
     val id: String,
     val type: ArtifactType,
     val title: String,
+    val jobId: String,
     val content: ByteArray,
     val metadata: Map<String, String>,
     val createdAt: Instant = Instant.now(),
 ) {
-    override fun equals(other: Any?) = other is Artifact && id == other.id
+    override fun equals(other: Any?) = other is ArtifactInstance && id == other.id
     override fun hashCode() = id.hashCode()
 }
 
@@ -87,8 +62,41 @@ sealed class Action {
     data class RejectDecision(val decisionId: String, val reason: String) : Action()
     data class ExportData(val artifactId: String, val format: String) : Action()
     data class NavigateToPack(val packId: String) : Action()
-    data class OpenFlow(val flowId: String) : Action()
+    data class ExecuteJTBD(val jtbdId: String) : Action()
+    data class StartBlueprint(val blueprintId: String) : Action()
+    data class ContinueBlueprint(val blueprintId: String) : Action()
     data object Refresh : Action()
     data object OpenSettings : Action()
     data object OpenNotifications : Action()
+}
+
+/**
+ * User's domain preferences learned over time.
+ * Matches iOS UserDomainPreferences.
+ */
+data class UserDomainPreferences(
+    val frequentPacks: MutableMap<String, Int> = mutableMapOf(),
+    val frequentJTBDs: MutableMap<String, Int> = mutableMapOf(),
+    val preferredBlueprints: MutableMap<String, Int> = mutableMapOf(),
+    var averageSessionJTBDs: Double = 0.0,
+) {
+    fun recordPackUsage(packId: String) {
+        frequentPacks.merge(packId, 1) { a, b -> a + b }
+    }
+
+    fun recordJTBDUsage(jtbdId: String) {
+        frequentJTBDs.merge(jtbdId, 1) { a, b -> a + b }
+    }
+
+    fun topPacks(limit: Int = 3): List<String> =
+        frequentPacks.entries
+            .sortedByDescending { it.value }
+            .take(limit)
+            .map { it.key }
+
+    fun topJTBDs(limit: Int = 5): List<String> =
+        frequentJTBDs.entries
+            .sortedByDescending { it.value }
+            .take(limit)
+            .map { it.key }
 }

@@ -6,13 +6,17 @@ package zone.converge.android.data
 /**
  * Domain Knowledge Base for Converge.
  *
- * Contains the canonical domain model:
+ * Contains the canonical domain model aligned with iOS:
  * - 5 Core Packs: Money, Customers, Delivery, People, Trust
- * - 15+ Core JTBDs (Jobs To Be Done)
+ * - 15 Core JTBDs (Jobs To Be Done)
  * - 5 Blueprints: Lead-to-Cash, Invoice-to-Cash, Promise-to-Delivery, etc.
  * - 5 Flows: Deal-Closed, Work-Completed, Payment-Received, etc.
  *
- * This is derived from converge-business research.
+ * ID conventions (matching iOS):
+ * - Packs: "pack-{name}" e.g., "pack-money"
+ * - JTBDs: "jtbd-{verb}-{object}" e.g., "jtbd-issue-invoice"
+ * - Blueprints: "blueprint-{name}" e.g., "blueprint-lead-to-cash"
+ * - Flows: "flow-{name}" e.g., "flow-deal-closed"
  */
 object DomainKnowledgeBase {
 
@@ -22,39 +26,39 @@ object DomainKnowledgeBase {
 
     val packs: List<DomainPack> = listOf(
         DomainPack(
-            id = "money",
+            id = "pack-money",
             name = "Money",
-            description = "AR → AP → Reconcile → Close",
-            jtbds = listOf("issue-invoice", "receive-payment", "pay-vendor", "reconcile-account", "close-period"),
-            icon = "attach_money",
+            description = "Financial operations: invoicing, payments, reconciliation, period close",
+            icon = "dollarsign.circle",
+            relatedPacks = listOf("pack-customers", "pack-delivery", "pack-trust"),
         ),
         DomainPack(
-            id = "customers",
+            id = "pack-customers",
             name = "Customers",
-            description = "Lead → Qualify → Offer → Close → Handoff",
-            jtbds = listOf("capture-lead", "qualify-lead", "send-proposal", "close-deal", "handoff-customer"),
-            icon = "people",
+            description = "Revenue generation: leads, opportunities, proposals, deals",
+            icon = "person.2",
+            relatedPacks = listOf("pack-money", "pack-delivery"),
         ),
         DomainPack(
-            id = "delivery",
+            id = "pack-delivery",
             name = "Delivery",
-            description = "Promise → Execute → Complete",
-            jtbds = listOf("make-promise", "track-execution", "complete-delivery", "handle-blocker"),
-            icon = "local_shipping",
+            description = "Value delivery: promises, work items, blockers, acceptance",
+            icon = "shippingbox",
+            relatedPacks = listOf("pack-customers", "pack-money", "pack-people"),
         ),
         DomainPack(
-            id = "people",
+            id = "pack-people",
             name = "People",
-            description = "Hire → Onboard → Pay → Review → Offboard",
-            jtbds = listOf("post-job", "hire-candidate", "onboard-employee", "run-payroll", "conduct-review"),
-            icon = "badge",
+            description = "Workforce: hiring, onboarding, access, payroll",
+            icon = "person.3",
+            relatedPacks = listOf("pack-delivery", "pack-money", "pack-trust"),
         ),
         DomainPack(
-            id = "trust",
+            id = "pack-trust",
             name = "Trust",
-            description = "Identity → Access → Audit → Compliance",
-            jtbds = listOf("verify-identity", "grant-access", "audit-action", "check-compliance"),
-            icon = "verified_user",
+            description = "Governance: audit trails, compliance, risk management",
+            icon = "shield.checkered",
+            relatedPacks = listOf("pack-money", "pack-people", "pack-customers"),
         ),
     )
 
@@ -63,244 +67,206 @@ object DomainKnowledgeBase {
     // ================================
 
     val jtbds: Map<String, JTBD> = mapOf(
-        // Money Pack
-        "issue-invoice" to JTBD(
-            id = "issue-invoice",
-            packId = "money",
-            title = "Issue Invoice",
-            outcome = "Customer receives accurate invoice with correct terms",
-            prerequisites = listOf("close-deal", "make-promise"),
-            nextSteps = listOf("receive-payment"),
-            producesArtifacts = listOf(ArtifactType.INVOICE),
-            requiresArtifacts = listOf(ArtifactType.CONTRACT, ArtifactType.PROPOSAL),
+        // === Money Pack JTBDs ===
+        "jtbd-issue-invoice" to JTBD(
+            id = "jtbd-issue-invoice",
+            packId = "pack-money",
+            name = "Issue Invoice",
+            verb = "Issue",
+            obj = "invoice",
+            outcome = "Customer receives accurate invoice with all deliverables documented",
+            prerequisites = listOf("jtbd-confirm-acceptance"),
+            nextSteps = listOf("jtbd-collect-payment"),
+            requiredArtifacts = listOf(ArtifactType.ACCEPTANCE, ArtifactType.DEAL),
+            producedArtifacts = listOf(ArtifactType.INVOICE),
         ),
-        "receive-payment" to JTBD(
-            id = "receive-payment",
-            packId = "money",
-            title = "Receive Payment",
-            outcome = "Payment is recorded and matched to invoice",
-            prerequisites = listOf("issue-invoice"),
-            nextSteps = listOf("reconcile-account"),
-            producesArtifacts = listOf(ArtifactType.PAYMENT_RECORD),
-            requiresArtifacts = listOf(ArtifactType.INVOICE),
+        "jtbd-collect-payment" to JTBD(
+            id = "jtbd-collect-payment",
+            packId = "pack-money",
+            name = "Collect Payment",
+            verb = "Collect",
+            obj = "payment",
+            outcome = "Payment received and recorded against invoice",
+            prerequisites = listOf("jtbd-issue-invoice"),
+            nextSteps = listOf("jtbd-reconcile-books"),
+            requiredArtifacts = listOf(ArtifactType.INVOICE),
+            producedArtifacts = listOf(ArtifactType.PAYMENT),
         ),
-        "pay-vendor" to JTBD(
-            id = "pay-vendor",
-            packId = "money",
-            title = "Pay Vendor",
-            outcome = "Vendor payment is approved and processed",
-            prerequisites = listOf("complete-delivery"),
-            nextSteps = listOf("reconcile-account"),
-            producesArtifacts = listOf(ArtifactType.PAYMENT_RECORD),
-            requiresArtifacts = listOf(ArtifactType.INVOICE),
+        "jtbd-reconcile-books" to JTBD(
+            id = "jtbd-reconcile-books",
+            packId = "pack-money",
+            name = "Reconcile Books",
+            verb = "Reconcile",
+            obj = "accounts",
+            outcome = "All transactions matched and verified",
+            prerequisites = listOf("jtbd-collect-payment"),
+            nextSteps = listOf("jtbd-close-period"),
+            requiredArtifacts = listOf(ArtifactType.PAYMENT),
+            producedArtifacts = listOf(ArtifactType.RECONCILIATION),
         ),
-        "reconcile-account" to JTBD(
-            id = "reconcile-account",
-            packId = "money",
-            title = "Reconcile Account",
-            outcome = "All transactions are matched and verified",
-            prerequisites = listOf("receive-payment", "pay-vendor"),
-            nextSteps = listOf("close-period"),
-            producesArtifacts = listOf(ArtifactType.RECONCILIATION_REPORT),
-            requiresArtifacts = listOf(ArtifactType.PAYMENT_RECORD),
-        ),
-        "close-period" to JTBD(
-            id = "close-period",
-            packId = "money",
-            title = "Close Period",
-            outcome = "Financial period is closed with audit trail",
-            prerequisites = listOf("reconcile-account"),
+        "jtbd-close-period" to JTBD(
+            id = "jtbd-close-period",
+            packId = "pack-money",
+            name = "Close Period",
+            verb = "Close",
+            obj = "period",
+            outcome = "Financial period closed with accurate statements",
+            prerequisites = listOf("jtbd-reconcile-books"),
             nextSteps = emptyList(),
-            producesArtifacts = listOf(ArtifactType.PERIOD_CLOSE_REPORT),
-            requiresArtifacts = listOf(ArtifactType.RECONCILIATION_REPORT),
+            requiredArtifacts = listOf(ArtifactType.RECONCILIATION),
+            producedArtifacts = listOf(ArtifactType.PERIOD_CLOSE, ArtifactType.AUDIT_ENTRY),
         ),
 
-        // Customers Pack
-        "capture-lead" to JTBD(
-            id = "capture-lead",
-            packId = "customers",
-            title = "Capture Lead",
-            outcome = "Lead is enriched, scored, and assigned within 24h",
+        // === Customers Pack JTBDs ===
+        "jtbd-capture-lead" to JTBD(
+            id = "jtbd-capture-lead",
+            packId = "pack-customers",
+            name = "Capture Lead",
+            verb = "Capture",
+            obj = "lead",
+            outcome = "Potential customer identified and qualified",
             prerequisites = emptyList(),
-            nextSteps = listOf("qualify-lead"),
-            producesArtifacts = listOf(ArtifactType.LEAD_RECORD),
-            requiresArtifacts = emptyList(),
+            nextSteps = listOf("jtbd-develop-opportunity"),
+            requiredArtifacts = listOf(ArtifactType.SIGNAL),
+            producedArtifacts = listOf(ArtifactType.LEAD),
         ),
-        "qualify-lead" to JTBD(
-            id = "qualify-lead",
-            packId = "customers",
-            title = "Qualify Lead",
-            outcome = "Lead is scored and routed to appropriate rep",
-            prerequisites = listOf("capture-lead"),
-            nextSteps = listOf("send-proposal"),
-            producesArtifacts = listOf(ArtifactType.QUALIFICATION_SCORE),
-            requiresArtifacts = listOf(ArtifactType.LEAD_RECORD),
+        "jtbd-develop-opportunity" to JTBD(
+            id = "jtbd-develop-opportunity",
+            packId = "pack-customers",
+            name = "Develop Opportunity",
+            verb = "Develop",
+            obj = "opportunity",
+            outcome = "Lead converted to qualified opportunity with clear needs",
+            prerequisites = listOf("jtbd-capture-lead"),
+            nextSteps = listOf("jtbd-create-proposal"),
+            requiredArtifacts = listOf(ArtifactType.LEAD),
+            producedArtifacts = listOf(ArtifactType.OPPORTUNITY),
         ),
-        "send-proposal" to JTBD(
-            id = "send-proposal",
-            packId = "customers",
-            title = "Send Proposal",
-            outcome = "Proposal is sent with tracked opens and engagement",
-            prerequisites = listOf("qualify-lead"),
-            nextSteps = listOf("close-deal"),
-            producesArtifacts = listOf(ArtifactType.PROPOSAL),
-            requiresArtifacts = listOf(ArtifactType.QUALIFICATION_SCORE),
+        "jtbd-create-proposal" to JTBD(
+            id = "jtbd-create-proposal",
+            packId = "pack-customers",
+            name = "Create Proposal",
+            verb = "Create",
+            obj = "proposal",
+            outcome = "Compelling proposal that addresses customer needs",
+            prerequisites = listOf("jtbd-develop-opportunity"),
+            nextSteps = listOf("jtbd-close-deal"),
+            requiredArtifacts = listOf(ArtifactType.OPPORTUNITY, ArtifactType.STRATEGY),
+            producedArtifacts = listOf(ArtifactType.PROPOSAL),
         ),
-        "close-deal" to JTBD(
-            id = "close-deal",
-            packId = "customers",
-            title = "Close Deal",
-            outcome = "Contract is signed and deal is closed-won",
-            prerequisites = listOf("send-proposal"),
-            nextSteps = listOf("handoff-customer", "issue-invoice"),
-            producesArtifacts = listOf(ArtifactType.CONTRACT, ArtifactType.DEAL_RECORD),
-            requiresArtifacts = listOf(ArtifactType.PROPOSAL),
-        ),
-        "handoff-customer" to JTBD(
-            id = "handoff-customer",
-            packId = "customers",
-            title = "Handoff Customer",
-            outcome = "Customer is handed off to delivery with clear expectations",
-            prerequisites = listOf("close-deal"),
-            nextSteps = listOf("make-promise"),
-            producesArtifacts = listOf(ArtifactType.HANDOFF_DOCUMENT),
-            requiresArtifacts = listOf(ArtifactType.CONTRACT),
+        "jtbd-close-deal" to JTBD(
+            id = "jtbd-close-deal",
+            packId = "pack-customers",
+            name = "Close Deal",
+            verb = "Close",
+            obj = "deal",
+            outcome = "Customer commits with signed contract",
+            prerequisites = listOf("jtbd-create-proposal"),
+            nextSteps = listOf("jtbd-make-promise"),
+            requiredArtifacts = listOf(ArtifactType.PROPOSAL),
+            producedArtifacts = listOf(ArtifactType.DEAL, ArtifactType.CONTRACT),
         ),
 
-        // Delivery Pack
-        "make-promise" to JTBD(
-            id = "make-promise",
-            packId = "delivery",
-            title = "Make Promise",
-            outcome = "Delivery scope and timeline are committed",
-            prerequisites = listOf("handoff-customer"),
-            nextSteps = listOf("track-execution"),
-            producesArtifacts = listOf(ArtifactType.PROMISE_RECORD),
-            requiresArtifacts = listOf(ArtifactType.HANDOFF_DOCUMENT, ArtifactType.CONTRACT),
+        // === Delivery Pack JTBDs ===
+        "jtbd-make-promise" to JTBD(
+            id = "jtbd-make-promise",
+            packId = "pack-delivery",
+            name = "Make Promise",
+            verb = "Make",
+            obj = "promise",
+            outcome = "Clear commitment on deliverables, timeline, and quality",
+            prerequisites = listOf("jtbd-close-deal"),
+            nextSteps = listOf("jtbd-execute-work"),
+            requiredArtifacts = listOf(ArtifactType.DEAL, ArtifactType.CONTRACT),
+            producedArtifacts = listOf(ArtifactType.PROMISE),
         ),
-        "track-execution" to JTBD(
-            id = "track-execution",
-            packId = "delivery",
-            title = "Track Execution",
-            outcome = "Delivery progress is visible and on track",
-            prerequisites = listOf("make-promise"),
-            nextSteps = listOf("complete-delivery", "handle-blocker"),
-            producesArtifacts = listOf(ArtifactType.STATUS_REPORT),
-            requiresArtifacts = listOf(ArtifactType.PROMISE_RECORD),
+        "jtbd-execute-work" to JTBD(
+            id = "jtbd-execute-work",
+            packId = "pack-delivery",
+            name = "Execute Work",
+            verb = "Execute",
+            obj = "work",
+            outcome = "Work completed according to promise specifications",
+            prerequisites = listOf("jtbd-make-promise"),
+            nextSteps = listOf("jtbd-confirm-acceptance"),
+            requiredArtifacts = listOf(ArtifactType.PROMISE),
+            producedArtifacts = listOf(ArtifactType.WORK_ITEM),
         ),
-        "complete-delivery" to JTBD(
-            id = "complete-delivery",
-            packId = "delivery",
-            title = "Complete Delivery",
-            outcome = "Delivery is completed and accepted by customer",
-            prerequisites = listOf("track-execution"),
-            nextSteps = listOf("issue-invoice"),
-            producesArtifacts = listOf(ArtifactType.COMPLETION_CERTIFICATE),
-            requiresArtifacts = listOf(ArtifactType.PROMISE_RECORD),
-        ),
-        "handle-blocker" to JTBD(
-            id = "handle-blocker",
-            packId = "delivery",
-            title = "Handle Blocker",
-            outcome = "Blocker is resolved or escalated appropriately",
-            prerequisites = listOf("track-execution"),
-            nextSteps = listOf("track-execution"),
-            producesArtifacts = listOf(ArtifactType.ESCALATION_RECORD),
-            requiresArtifacts = listOf(ArtifactType.STATUS_REPORT),
-        ),
-
-        // People Pack
-        "post-job" to JTBD(
-            id = "post-job",
-            packId = "people",
-            title = "Post Job",
-            outcome = "Job posting is live and attracting qualified candidates",
+        "jtbd-resolve-blocker" to JTBD(
+            id = "jtbd-resolve-blocker",
+            packId = "pack-delivery",
+            name = "Resolve Blocker",
+            verb = "Resolve",
+            obj = "blocker",
+            outcome = "Impediment removed and work can proceed",
             prerequisites = emptyList(),
-            nextSteps = listOf("hire-candidate"),
-            producesArtifacts = listOf(ArtifactType.JOB_POSTING),
-            requiresArtifacts = emptyList(),
+            nextSteps = listOf("jtbd-execute-work"),
+            requiredArtifacts = listOf(ArtifactType.BLOCKER),
+            producedArtifacts = listOf(ArtifactType.DECISION),
         ),
-        "hire-candidate" to JTBD(
-            id = "hire-candidate",
-            packId = "people",
-            title = "Hire Candidate",
-            outcome = "Candidate accepts offer and is ready to start",
-            prerequisites = listOf("post-job"),
-            nextSteps = listOf("onboard-employee"),
-            producesArtifacts = listOf(ArtifactType.OFFER_LETTER, ArtifactType.EMPLOYEE_RECORD),
-            requiresArtifacts = listOf(ArtifactType.JOB_POSTING),
+        "jtbd-confirm-acceptance" to JTBD(
+            id = "jtbd-confirm-acceptance",
+            packId = "pack-delivery",
+            name = "Confirm Acceptance",
+            verb = "Confirm",
+            obj = "acceptance",
+            outcome = "Customer confirms work meets requirements",
+            prerequisites = listOf("jtbd-execute-work"),
+            nextSteps = listOf("jtbd-issue-invoice"),
+            requiredArtifacts = listOf(ArtifactType.WORK_ITEM),
+            producedArtifacts = listOf(ArtifactType.ACCEPTANCE),
         ),
-        "onboard-employee" to JTBD(
-            id = "onboard-employee",
-            packId = "people",
-            title = "Onboard Employee",
-            outcome = "Employee is productive with access to all systems",
-            prerequisites = listOf("hire-candidate"),
-            nextSteps = listOf("run-payroll", "grant-access"),
-            producesArtifacts = listOf(ArtifactType.ONBOARDING_CHECKLIST),
-            requiresArtifacts = listOf(ArtifactType.EMPLOYEE_RECORD),
+
+        // === People Pack JTBDs ===
+        "jtbd-onboard-person" to JTBD(
+            id = "jtbd-onboard-person",
+            packId = "pack-people",
+            name = "Onboard Person",
+            verb = "Onboard",
+            obj = "person",
+            outcome = "New team member is productive with proper access and training",
+            prerequisites = emptyList(),
+            nextSteps = listOf("jtbd-grant-access"),
+            requiredArtifacts = listOf(ArtifactType.CONTRACT),
+            producedArtifacts = listOf(ArtifactType.EMPLOYEE, ArtifactType.CONTRACTOR),
         ),
-        "run-payroll" to JTBD(
-            id = "run-payroll",
-            packId = "people",
-            title = "Run Payroll",
-            outcome = "Employees are paid accurately and on time",
-            prerequisites = listOf("onboard-employee"),
-            nextSteps = listOf("reconcile-account"),
-            producesArtifacts = listOf(ArtifactType.PAYROLL_RECORD),
-            requiresArtifacts = listOf(ArtifactType.EMPLOYEE_RECORD),
+        "jtbd-grant-access" to JTBD(
+            id = "jtbd-grant-access",
+            packId = "pack-people",
+            name = "Grant Access",
+            verb = "Grant",
+            obj = "access",
+            outcome = "Person has appropriate system access for their role",
+            prerequisites = listOf("jtbd-onboard-person"),
+            nextSteps = listOf("jtbd-execute-work"),
+            requiredArtifacts = listOf(ArtifactType.EMPLOYEE),
+            producedArtifacts = listOf(ArtifactType.ACCESS_GRANT, ArtifactType.AUDIT_ENTRY),
         ),
-        "conduct-review" to JTBD(
-            id = "conduct-review",
-            packId = "people",
-            title = "Conduct Review",
-            outcome = "Performance is documented with clear feedback",
+        "jtbd-run-payroll" to JTBD(
+            id = "jtbd-run-payroll",
+            packId = "pack-people",
+            name = "Run Payroll",
+            verb = "Run",
+            obj = "payroll",
+            outcome = "All team members paid accurately and on time",
+            prerequisites = emptyList(),
+            nextSteps = listOf("jtbd-reconcile-books"),
+            requiredArtifacts = listOf(ArtifactType.EMPLOYEE, ArtifactType.CONTRACTOR),
+            producedArtifacts = listOf(ArtifactType.PAYROLL_RUN, ArtifactType.PAYMENT),
+        ),
+
+        // === Trust Pack JTBDs ===
+        "jtbd-record-compliance" to JTBD(
+            id = "jtbd-record-compliance",
+            packId = "pack-trust",
+            name = "Record Compliance",
+            verb = "Record",
+            obj = "compliance",
+            outcome = "Compliance evidence captured and verified",
             prerequisites = emptyList(),
             nextSteps = emptyList(),
-            producesArtifacts = listOf(ArtifactType.REVIEW_DOCUMENT),
-            requiresArtifacts = listOf(ArtifactType.EMPLOYEE_RECORD),
-        ),
-
-        // Trust Pack
-        "verify-identity" to JTBD(
-            id = "verify-identity",
-            packId = "trust",
-            title = "Verify Identity",
-            outcome = "Identity is verified with appropriate evidence",
-            prerequisites = emptyList(),
-            nextSteps = listOf("grant-access"),
-            producesArtifacts = listOf(ArtifactType.IDENTITY_VERIFICATION),
-            requiresArtifacts = emptyList(),
-        ),
-        "grant-access" to JTBD(
-            id = "grant-access",
-            packId = "trust",
-            title = "Grant Access",
-            outcome = "Access is granted with proper authorization",
-            prerequisites = listOf("verify-identity"),
-            nextSteps = listOf("audit-action"),
-            producesArtifacts = listOf(ArtifactType.ACCESS_GRANT),
-            requiresArtifacts = listOf(ArtifactType.IDENTITY_VERIFICATION),
-        ),
-        "audit-action" to JTBD(
-            id = "audit-action",
-            packId = "trust",
-            title = "Audit Action",
-            outcome = "Action is logged with full provenance",
-            prerequisites = emptyList(),
-            nextSteps = listOf("check-compliance"),
-            producesArtifacts = listOf(ArtifactType.AUDIT_LOG),
-            requiresArtifacts = emptyList(),
-        ),
-        "check-compliance" to JTBD(
-            id = "check-compliance",
-            packId = "trust",
-            title = "Check Compliance",
-            outcome = "Compliance status is verified and documented",
-            prerequisites = listOf("audit-action"),
-            nextSteps = emptyList(),
-            producesArtifacts = listOf(ArtifactType.COMPLIANCE_REPORT),
-            requiresArtifacts = listOf(ArtifactType.AUDIT_LOG),
+            requiredArtifacts = listOf(ArtifactType.AUDIT_ENTRY),
+            producedArtifacts = listOf(ArtifactType.COMPLIANCE_RECORD),
         ),
     )
 
@@ -310,46 +276,71 @@ object DomainKnowledgeBase {
 
     val blueprints: List<Blueprint> = listOf(
         Blueprint(
-            id = "lead-to-cash",
+            id = "blueprint-lead-to-cash",
             name = "Lead to Cash",
-            description = "Complete customer lifecycle from first contact to payment",
-            packs = listOf("customers", "delivery", "money"),
+            description = "Complete revenue cycle from lead capture through payment collection",
+            packIds = listOf("pack-customers", "pack-delivery", "pack-money"),
             jtbdSequence = listOf(
-                "capture-lead", "qualify-lead", "send-proposal", "close-deal",
-                "handoff-customer", "make-promise", "track-execution",
-                "complete-delivery", "issue-invoice", "receive-payment",
+                "jtbd-capture-lead",
+                "jtbd-develop-opportunity",
+                "jtbd-create-proposal",
+                "jtbd-close-deal",
+                "jtbd-make-promise",
+                "jtbd-execute-work",
+                "jtbd-confirm-acceptance",
+                "jtbd-issue-invoice",
+                "jtbd-collect-payment",
             ),
+            icon = "arrow.triangle.2.circlepath",
         ),
         Blueprint(
-            id = "invoice-to-cash",
+            id = "blueprint-invoice-to-cash",
             name = "Invoice to Cash",
-            description = "From invoice creation to cash collection",
-            packs = listOf("money"),
-            jtbdSequence = listOf("issue-invoice", "receive-payment", "reconcile-account"),
-        ),
-        Blueprint(
-            id = "promise-to-delivery",
-            name = "Promise to Delivery",
-            description = "From commitment to successful completion",
-            packs = listOf("delivery"),
-            jtbdSequence = listOf("make-promise", "track-execution", "complete-delivery"),
-        ),
-        Blueprint(
-            id = "hire-to-productive",
-            name = "Hire to Productive",
-            description = "From job posting to productive employee",
-            packs = listOf("people", "trust"),
+            description = "Billing through payment collection and reconciliation",
+            packIds = listOf("pack-delivery", "pack-money"),
             jtbdSequence = listOf(
-                "post-job", "hire-candidate", "verify-identity",
-                "grant-access", "onboard-employee",
+                "jtbd-confirm-acceptance",
+                "jtbd-issue-invoice",
+                "jtbd-collect-payment",
+                "jtbd-reconcile-books",
             ),
+            icon = "banknote",
         ),
         Blueprint(
-            id = "compliance-cycle",
+            id = "blueprint-promise-to-delivery",
+            name = "Promise to Delivery",
+            description = "Project execution from commitment through customer acceptance",
+            packIds = listOf("pack-delivery"),
+            jtbdSequence = listOf(
+                "jtbd-make-promise",
+                "jtbd-execute-work",
+                "jtbd-confirm-acceptance",
+            ),
+            icon = "shippingbox",
+        ),
+        Blueprint(
+            id = "blueprint-hire-to-productive",
+            name = "Hire to Productive",
+            description = "New hire onboarding through first contribution",
+            packIds = listOf("pack-people", "pack-delivery"),
+            jtbdSequence = listOf(
+                "jtbd-onboard-person",
+                "jtbd-grant-access",
+                "jtbd-execute-work",
+            ),
+            icon = "person.badge.plus",
+        ),
+        Blueprint(
+            id = "blueprint-compliance-cycle",
             name = "Compliance Cycle",
-            description = "Regular compliance verification and reporting",
-            packs = listOf("trust", "money"),
-            jtbdSequence = listOf("audit-action", "check-compliance", "close-period"),
+            description = "Period close with full audit trail and compliance recording",
+            packIds = listOf("pack-money", "pack-trust"),
+            jtbdSequence = listOf(
+                "jtbd-reconcile-books",
+                "jtbd-close-period",
+                "jtbd-record-compliance",
+            ),
+            icon = "checkmark.shield",
         ),
     )
 
@@ -359,44 +350,62 @@ object DomainKnowledgeBase {
 
     val flows: List<DomainFlow> = listOf(
         DomainFlow(
-            id = "deal-closed",
+            id = "flow-deal-closed",
             name = "Deal Closed",
-            description = "Trigger when a deal is closed-won",
-            triggerEvent = "deal.closed_won",
-            triggerPack = "customers",
-            targetJtbds = listOf("handoff-customer", "issue-invoice", "make-promise"),
+            trigger = FlowTrigger(
+                artifactType = ArtifactType.DEAL,
+                event = TriggerEvent.CREATED,
+            ),
+            steps = listOf(
+                FlowStep(id = "step-1", jtbdId = "jtbd-make-promise", condition = null, isOptional = false),
+                FlowStep(id = "step-2", jtbdId = "jtbd-onboard-person", condition = "requiresNewHire", isOptional = true),
+            ),
         ),
         DomainFlow(
-            id = "work-completed",
+            id = "flow-work-completed",
             name = "Work Completed",
-            description = "Trigger when delivery is completed",
-            triggerEvent = "delivery.completed",
-            triggerPack = "delivery",
-            targetJtbds = listOf("issue-invoice", "receive-payment"),
+            trigger = FlowTrigger(
+                artifactType = ArtifactType.WORK_ITEM,
+                event = TriggerEvent.COMPLETED,
+            ),
+            steps = listOf(
+                FlowStep(id = "step-1", jtbdId = "jtbd-confirm-acceptance", condition = null, isOptional = false),
+                FlowStep(id = "step-2", jtbdId = "jtbd-issue-invoice", condition = null, isOptional = false),
+            ),
         ),
         DomainFlow(
-            id = "payment-received",
+            id = "flow-payment-received",
             name = "Payment Received",
-            description = "Trigger when payment is received",
-            triggerEvent = "payment.received",
-            triggerPack = "money",
-            targetJtbds = listOf("reconcile-account"),
+            trigger = FlowTrigger(
+                artifactType = ArtifactType.PAYMENT,
+                event = TriggerEvent.CREATED,
+            ),
+            steps = listOf(
+                FlowStep(id = "step-1", jtbdId = "jtbd-reconcile-books", condition = null, isOptional = false),
+            ),
         ),
         DomainFlow(
-            id = "blocker-raised",
+            id = "flow-blocker-raised",
             name = "Blocker Raised",
-            description = "Trigger when a blocker is identified",
-            triggerEvent = "delivery.blocked",
-            triggerPack = "delivery",
-            targetJtbds = listOf("handle-blocker"),
+            trigger = FlowTrigger(
+                artifactType = ArtifactType.BLOCKER,
+                event = TriggerEvent.CREATED,
+            ),
+            steps = listOf(
+                FlowStep(id = "step-1", jtbdId = "jtbd-resolve-blocker", condition = null, isOptional = false),
+            ),
         ),
         DomainFlow(
-            id = "period-end",
+            id = "flow-period-end",
             name = "Period End",
-            description = "Trigger at end of financial period",
-            triggerEvent = "calendar.period_end",
-            triggerPack = "money",
-            targetJtbds = listOf("reconcile-account", "close-period", "check-compliance"),
+            trigger = FlowTrigger(
+                artifactType = ArtifactType.RECONCILIATION,
+                event = TriggerEvent.COMPLETED,
+            ),
+            steps = listOf(
+                FlowStep(id = "step-1", jtbdId = "jtbd-close-period", condition = null, isOptional = false),
+                FlowStep(id = "step-2", jtbdId = "jtbd-record-compliance", condition = "requiresCompliance", isOptional = true),
+            ),
         ),
     )
 
@@ -421,10 +430,15 @@ object DomainKnowledgeBase {
     }
 
     fun getJTBDsProducingArtifact(artifactType: ArtifactType): List<JTBD> =
-        jtbds.values.filter { artifactType in it.producesArtifacts }
+        jtbds.values.filter { artifactType in it.producedArtifacts }
 
     fun getJTBDsRequiringArtifact(artifactType: ArtifactType): List<JTBD> =
-        jtbds.values.filter { artifactType in it.requiresArtifacts }
+        jtbds.values.filter { artifactType in it.requiredArtifacts }
+
+    fun getRelatedPacks(packId: String): List<DomainPack> {
+        val pack = getPack(packId) ?: return emptyList()
+        return pack.relatedPacks.mapNotNull { getPack(it) }
+    }
 
     /**
      * Suggest next JTBDs based on recently produced artifacts.
@@ -445,6 +459,44 @@ object DomainKnowledgeBase {
             .firstOrNull { it !in completedJtbds }
             ?.let { jtbds[it] }
     }
+
+    /**
+     * Get pending prerequisites for a JTBD.
+     */
+    fun getPendingPrerequisites(jtbdId: String, completedJtbds: Set<String>): List<JTBD> {
+        val jtbd = getJTBD(jtbdId) ?: return emptyList()
+        return jtbd.prerequisites
+            .filter { it !in completedJtbds }
+            .mapNotNull { jtbds[it] }
+    }
+
+    /**
+     * Suggest next JTBDs after completing a job.
+     */
+    fun getSuggestedNextJTBDs(afterJtbdId: String, completedJtbds: Set<String>): List<JTBD> {
+        val jtbd = getJTBD(afterJtbdId) ?: return emptyList()
+
+        // Priority 1: Explicit next steps
+        val nextSteps = jtbd.nextSteps.mapNotNull { jtbds[it] }
+
+        // Priority 2: JTBDs that consume the artifacts we just produced
+        val consumingJTBDs = jtbd.producedArtifacts.flatMap { artifact ->
+            getJTBDsRequiringArtifact(artifact)
+        }.filter { it.id !in completedJtbds }
+
+        // Combine and dedupe
+        val seen = mutableSetOf<String>()
+        val result = mutableListOf<JTBD>()
+
+        for (j in nextSteps + consumingJTBDs) {
+            if (j.id !in seen) {
+                seen.add(j.id)
+                result.add(j)
+            }
+        }
+
+        return result
+    }
 }
 
 /**
@@ -454,23 +506,28 @@ data class DomainPack(
     val id: String,
     val name: String,
     val description: String,
-    val jtbds: List<String>,
     val icon: String,
+    val relatedPacks: List<String>,
 )
 
 /**
  * Job To Be Done - outcome-focused user goal.
+ * Matches iOS structure with verb/object for display name generation.
  */
 data class JTBD(
     val id: String,
     val packId: String,
-    val title: String,
+    val name: String,
+    val verb: String,
+    val obj: String,  // "object" is reserved in Kotlin
     val outcome: String,
     val prerequisites: List<String>,
     val nextSteps: List<String>,
-    val producesArtifacts: List<ArtifactType>,
-    val requiresArtifacts: List<ArtifactType>,
-)
+    val requiredArtifacts: List<ArtifactType>,
+    val producedArtifacts: List<ArtifactType>,
+) {
+    val displayName: String get() = "$verb $obj"
+}
 
 /**
  * Blueprint - multi-pack workflow with JTBD sequence.
@@ -479,9 +536,20 @@ data class Blueprint(
     val id: String,
     val name: String,
     val description: String,
-    val packs: List<String>,
+    val packIds: List<String>,
     val jtbdSequence: List<String>,
-)
+    val icon: String,
+) {
+    fun progress(completedJTBDs: Set<String>): Double {
+        if (jtbdSequence.isEmpty()) return 0.0
+        val completed = jtbdSequence.count { it in completedJTBDs }
+        return completed.toDouble() / jtbdSequence.size
+    }
+
+    fun nextJTBD(completedJTBDs: Set<String>): String? {
+        return jtbdSequence.firstOrNull { it !in completedJTBDs }
+    }
+}
 
 /**
  * Domain Flow - event-driven cross-pack trigger.
@@ -489,28 +557,73 @@ data class Blueprint(
 data class DomainFlow(
     val id: String,
     val name: String,
-    val description: String,
-    val triggerEvent: String,
-    val triggerPack: String,
-    val targetJtbds: List<String>,
+    val trigger: FlowTrigger,
+    val steps: List<FlowStep>,
+)
+
+data class FlowTrigger(
+    val artifactType: ArtifactType,
+    val event: TriggerEvent,
+)
+
+enum class TriggerEvent {
+    CREATED, COMPLETED, FAILED, APPROVED, REJECTED
+}
+
+data class FlowStep(
+    val id: String,
+    val jtbdId: String,
+    val condition: String?,
+    val isOptional: Boolean,
 )
 
 /**
  * Artifact types across all packs.
+ * Matches iOS ArtifactType enum.
  */
 enum class ArtifactType {
-    // Money
-    INVOICE, PAYMENT_RECORD, RECONCILIATION_REPORT, PERIOD_CLOSE_REPORT,
+    // Money Pack
+    INVOICE, PAYMENT, RECONCILIATION, PERIOD_CLOSE,
 
-    // Customers
-    LEAD_RECORD, QUALIFICATION_SCORE, PROPOSAL, CONTRACT, DEAL_RECORD, HANDOFF_DOCUMENT,
+    // Customers Pack
+    LEAD, OPPORTUNITY, PROPOSAL, CONTRACT, DEAL,
 
-    // Delivery
-    PROMISE_RECORD, STATUS_REPORT, COMPLETION_CERTIFICATE, ESCALATION_RECORD,
+    // Delivery Pack
+    PROMISE, WORK_ITEM, BLOCKER, ACCEPTANCE, POST_MORTEM,
 
-    // People
-    JOB_POSTING, OFFER_LETTER, EMPLOYEE_RECORD, ONBOARDING_CHECKLIST, PAYROLL_RECORD, REVIEW_DOCUMENT,
+    // People Pack
+    EMPLOYEE, CONTRACTOR, ACCESS_GRANT, PAYROLL_RUN,
 
-    // Trust
-    IDENTITY_VERIFICATION, ACCESS_GRANT, AUDIT_LOG, COMPLIANCE_REPORT,
+    // Trust Pack
+    AUDIT_ENTRY, COMPLIANCE_RECORD,
+
+    // Generic
+    SIGNAL, STRATEGY, EVALUATION, DECISION;
+
+    val displayName: String get() = when (this) {
+        INVOICE -> "Invoice"
+        PAYMENT -> "Payment"
+        RECONCILIATION -> "Reconciliation"
+        PERIOD_CLOSE -> "Period Close"
+        LEAD -> "Lead"
+        OPPORTUNITY -> "Opportunity"
+        PROPOSAL -> "Proposal"
+        CONTRACT -> "Contract"
+        DEAL -> "Deal"
+        PROMISE -> "Promise"
+        WORK_ITEM -> "Work Item"
+        BLOCKER -> "Blocker"
+        ACCEPTANCE -> "Acceptance"
+        POST_MORTEM -> "Post-Mortem"
+        EMPLOYEE -> "Employee"
+        CONTRACTOR -> "Contractor"
+        ACCESS_GRANT -> "Access Grant"
+        PAYROLL_RUN -> "Payroll Run"
+        AUDIT_ENTRY -> "Audit Entry"
+        COMPLIANCE_RECORD -> "Compliance Record"
+        SIGNAL -> "Signal"
+        STRATEGY -> "Strategy"
+        EVALUATION -> "Evaluation"
+        DECISION -> "Decision"
+    }
 }
