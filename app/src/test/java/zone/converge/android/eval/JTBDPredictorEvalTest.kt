@@ -45,10 +45,10 @@ class JTBDPredictorEvalTest {
             // Given: Active blueprint with some steps completed
             val context = DomainContext(
                 activeBlueprints = mapOf(
-                    "blueprint-lead-to-cash" to setOf("jtbd-capture-lead", "jtbd-qualify-opportunity"),
+                    "blueprint-lead-to-cash" to setOf("jtbd-capture-lead", "jtbd-develop-opportunity"),
                 ),
                 recentlyProducedArtifacts = setOf(ArtifactType.OPPORTUNITY),
-                completedJtbds = setOf("jtbd-capture-lead", "jtbd-qualify-opportunity"),
+                completedJtbds = setOf("jtbd-capture-lead", "jtbd-develop-opportunity"),
                 currentPackId = "pack-customers",
             )
 
