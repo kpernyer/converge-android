@@ -1,5 +1,5 @@
 {
-  "description": "JTBD prediction eval cases",
+  "description": "JTBD prediction and contract compliance eval cases",
   "cases": [
     {
       "id": "blueprint-continuation",
@@ -64,10 +64,91 @@
       }
     }
   ],
+  "contract_evals": {
+    "_comment": "Evals per CROSS_PLATFORM_CONTRACT.md §17.1",
+    "cases": [
+      {
+        "id": "truth.fact_from_proposal",
+        "description": "Proposal becomes Fact only after invariant check",
+        "context": {
+          "facts": []
+        },
+        "proposal": {
+          "action": "execute_jtbd",
+          "jtbd_id": "jtbd-issue-invoice"
+        },
+        "expected": {
+          "must_pass_invariant_check": true,
+          "fact_created_only_after_check": true
+        }
+      },
+      {
+        "id": "truth.halt_on_violation",
+        "description": "System halts when invariant violated",
+        "context": {
+          "facts": [{ "type": "period.closed", "period_id": "2024-Q1" }]
+        },
+        "proposal": {
+          "action": "create_invoice",
+          "period_id": "2024-Q1"
+        },
+        "expected": {
+          "decision": "halted",
+          "truth_id": "money.period.closed_invariant",
+          "reason_contains": "Period is closed"
+        }
+      },
+      {
+        "id": "context.actor_present",
+        "description": "Every entry has actor",
+        "expected": {
+          "all_entries_have_actor": true,
+          "actor_has_type": true,
+          "actor_has_device_id": true
+        }
+      },
+      {
+        "id": "context.correlation_linked",
+        "description": "Related entries share correlation_id",
+        "expected": {
+          "proposal_and_fact_share_correlation_id": true,
+          "trace_references_correlation_id": true
+        }
+      },
+      {
+        "id": "determinism.no_llm_mode",
+        "description": "Core logic works without ML",
+        "context": {
+          "activeBlueprints": {
+            "blueprint-lead-to-cash": ["jtbd-capture-lead"]
+          }
+        },
+        "ml_enabled": false,
+        "expected": {
+          "predictions_still_work": true,
+          "uses_rule_based_fallback": true
+        }
+      },
+      {
+        "id": "stream.resume_sequence",
+        "description": "Reconnect resumes from last sequence",
+        "context": {
+          "last_known_sequence": 1234
+        },
+        "expected": {
+          "watch_request_includes_since_sequence": true,
+          "sequence_is_1234": true
+        }
+      }
+    ]
+  },
   "invariants": [
     "predictions are always sorted by confidence descending",
     "no duplicate jtbd IDs in predictions",
     "confidence values are between 0 and 1",
-    "every prediction has a non-empty reason"
+    "every prediction has a non-empty reason",
+    "predictions are proposals, never facts (contract §10)",
+    "all context entries have actor (contract §4.2)",
+    "all context entries have correlation_id (contract §4.2)"
   ]
 }

@@ -27,12 +27,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import zone.converge.android.data.*
+import zone.converge.android.grpc.ConnectionState
+import zone.converge.android.grpc.RunStatusType
 import zone.converge.android.ml.*
 import zone.converge.android.ui.theme.ConvergeColors
 import zone.converge.android.ui.theme.ConvergeSpacing
 
 /**
  * Smart Action Screen - The main UI that shows the most likely action prominently.
+ *
+ * Per CROSS_PLATFORM_CONTRACT.md:
+ * - §1.5: Shows connection state indicator (streaming/reconnecting/degraded/offline)
+ * - §5.1: Shows halt explanations when invariants violated
+ * - §10: Treats predictions as proposals, not facts
+ * - §12: UI state derived from context, not local flags
  *
  * Layout:
  * - Hero area: Primary predicted action (one tap)
@@ -51,17 +59,36 @@ fun SmartActionScreen(
     onViewArtifact: (String) -> Unit,
     onOpenMenu: () -> Unit,
 ) {
-    val predictions by viewModel.predictions.collectAsState()
+    // Per contract §10: These are PROPOSALS, not facts
+    val proposals by viewModel.proposals.collectAsState()
     val blueprintSuggestions by viewModel.blueprintSuggestions.collectAsState()
     val recentActivity by viewModel.recentActivity.collectAsState()
 
-    val primaryPrediction = predictions.firstOrNull()
-    val secondaryPredictions = predictions.drop(1).take(4)
+    // Per contract §1.5: Connection state indicator
+    val connectionState by viewModel.connectionState.collectAsState()
+
+    // Per contract §1.8: Run status
+    val runStatus by viewModel.runStatus.collectAsState()
+
+    // Per contract §5.1: Halt explanation
+    val haltExplanation by viewModel.haltExplanation.collectAsState()
+
+    val primaryProposal = proposals.firstOrNull()
+    val secondaryProposals = proposals.drop(1).take(4)
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Converge") },
+                title = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Text("Converge")
+                        // Connection state indicator per contract §1.5
+                        ConnectionIndicator(connectionState)
+                    }
+                },
                 actions = {
                     IconButton(onClick = onOpenMenu) {
                         Icon(Icons.Default.Menu, contentDescription = "Menu")
@@ -80,18 +107,39 @@ fun SmartActionScreen(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            // Hero: Primary Action
+            // Halt Explanation Banner per contract §5.1
+            haltExplanation?.let { halt ->
+                item {
+                    HaltExplanationBanner(
+                        explanation = halt,
+                        onRetry = { viewModel.clearHaltAndRetry() },
+                    )
+                }
+            }
+
+            // Run Status Indicator per contract §1.8
+            runStatus?.let { status ->
+                if (status.status == RunStatusType.WAITING) {
+                    item {
+                        WaitingStatusBanner(
+                            waitingFor = status.waitingFor,
+                        )
+                    }
+                }
+            }
+
+            // Hero: Primary Action (per §10: this is a PROPOSAL, not a fact)
             item {
-                primaryPrediction?.let { prediction ->
+                primaryProposal?.let { proposal ->
                     PrimaryActionCard(
-                        prediction = prediction,
-                        onClick = { onExecuteJTBD(prediction.jtbd) },
+                        prediction = proposal,
+                        onClick = { onExecuteJTBD(proposal.jtbd) },
                     )
                 } ?: EmptyStateCard()
             }
 
-            // Quick Actions Row
-            if (secondaryPredictions.isNotEmpty()) {
+            // Quick Actions Row (all proposals, not facts)
+            if (secondaryProposals.isNotEmpty()) {
                 item {
                     Text(
                         "Quick Actions",
@@ -103,10 +151,10 @@ fun SmartActionScreen(
                     LazyRow(
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
-                        items(secondaryPredictions) { prediction ->
+                        items(secondaryProposals) { proposal ->
                             QuickActionChip(
-                                prediction = prediction,
-                                onClick = { onExecuteJTBD(prediction.jtbd) },
+                                prediction = proposal,
+                                onClick = { onExecuteJTBD(proposal.jtbd) },
                             )
                         }
                     }
@@ -479,4 +527,176 @@ data class ActivityRecord(
 
 enum class ActivityType {
     JOB_COMPLETED, ARTIFACT_CREATED, DECISION_PENDING, NOTIFICATION
+}
+
+/**
+ * Connection state indicator per contract §1.5
+ *
+ * | State | Meaning | UI Indication |
+ * |-------|---------|---------------|
+ * | streaming | Live connection | Green indicator |
+ * | reconnecting | Temporary disconnect | Yellow indicator |
+ * | degraded | REST fallback | Orange indicator + "Limited mode" |
+ * | offline | No connection | Red indicator + "Offline" |
+ */
+@Composable
+fun ConnectionIndicator(state: ConnectionState) {
+    when (state) {
+        ConnectionState.STREAMING -> {
+            Box(
+                modifier = Modifier
+                    .size(8.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFF4CAF50)) // Green
+            )
+        }
+        ConnectionState.RECONNECTING -> {
+            Box(
+                modifier = Modifier
+                    .size(8.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFFFFEB3B)) // Yellow
+            )
+        }
+        ConnectionState.DEGRADED -> {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(8.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFFFF9800)) // Orange
+                )
+                Text(
+                    "Limited",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color(0xFFFF9800),
+                )
+            }
+        }
+        ConnectionState.OFFLINE -> {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(8.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFFF44336)) // Red
+                )
+                Text(
+                    "Offline",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color(0xFFF44336),
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Halt explanation banner per contract §5.1
+ * Shows: HALT → EXPLAIN → offer RESTART
+ */
+@Composable
+fun HaltExplanationBanner(
+    explanation: HaltExplanation,
+    onRetry: () -> Unit,
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.errorContainer,
+        ),
+        shape = RoundedCornerShape(12.dp),
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Warning,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error,
+                )
+                Text(
+                    "Action blocked",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onErrorContainer,
+                )
+            }
+            Text(
+                explanation.reason,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onErrorContainer,
+            )
+            explanation.truthId?.let { truthId ->
+                Text(
+                    "Truth: $truthId",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.7f),
+                )
+            }
+            if (explanation.canRetry) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
+                ) {
+                    TextButton(onClick = onRetry) {
+                        Text("Dismiss")
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Waiting status banner per contract §1.9
+ * Shows what the run is waiting for.
+ */
+@Composable
+fun WaitingStatusBanner(
+    waitingFor: List<String>,
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+        ),
+        shape = RoundedCornerShape(12.dp),
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(24.dp),
+                strokeWidth = 2.dp,
+            )
+            Column {
+                Text(
+                    "Waiting for input",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                waitingFor.forEach { waiting ->
+                    Text(
+                        waiting,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f),
+                    )
+                }
+            }
+        }
+    }
 }
