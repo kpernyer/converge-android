@@ -4,6 +4,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.protobuf")
+    id("app.cash.paparazzi") version "1.3.2"
 }
 
 android {
@@ -24,8 +25,13 @@ android {
     }
 
     buildTypes {
+        debug {
+            // StrictMode enabled in Application class
+            buildConfigField("boolean", "STRICT_MODE", "true")
+        }
         release {
             isMinifyEnabled = true
+            buildConfigField("boolean", "STRICT_MODE", "false")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -44,6 +50,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     composeOptions {
@@ -56,6 +63,13 @@ android {
             // gRPC netty duplicates
             excludes += "META-INF/INDEX.LIST"
             excludes += "META-INF/io.netty.versions.properties"
+        }
+    }
+
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+            isReturnDefaultValues = true
         }
     }
 }
@@ -130,11 +144,43 @@ dependencies {
     implementation("org.tensorflow:tensorflow-lite-gpu:2.14.0")
     implementation("org.tensorflow:tensorflow-lite-support:0.4.4")
 
-    // Testing
-    testImplementation("junit:junit:4.13.2")
+    // Observability
+    implementation("io.sentry:sentry-android:7.3.0")
+    implementation("io.sentry:sentry-android-timber:7.3.0")
+    implementation("com.jakewharton.timber:timber:5.0.1")
+
+    // =========================================================================
+    // Testing Stack - "Serious" quality signals
+    // =========================================================================
+
+    // JUnit 5 (prefer over JUnit 4)
+    testImplementation(platform("org.junit:junit-bom:5.10.2"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    // Coroutines testing
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+
+    // Turbine - test Flow emissions cleanly (async testing done right)
+    testImplementation("app.cash.turbine:turbine:1.0.0")
+
+    // MockK - Kotlin-first mocking
+    testImplementation("io.mockk:mockk:1.13.9")
+
+    // Truth - fluent assertions
+    testImplementation("com.google.truth:truth:1.4.0")
+
+    // Paparazzi - fast JVM screenshot tests (no emulator needed)
+    // Plugin applied above, no additional dependency needed
+
+    // Android instrumentation tests
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation(platform("androidx.compose:compose-bom:2024.01.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    androidTestImplementation("io.mockk:mockk-android:1.13.9")
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
 }

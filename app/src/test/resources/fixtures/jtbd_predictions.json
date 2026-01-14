@@ -1,0 +1,73 @@
+{
+  "description": "JTBD prediction eval cases",
+  "cases": [
+    {
+      "id": "blueprint-continuation",
+      "description": "Should suggest next step when blueprint is active",
+      "context": {
+        "activeBlueprints": {
+          "blueprint-lead-to-cash": ["jtbd-capture-lead", "jtbd-qualify-opportunity"]
+        },
+        "recentlyProducedArtifacts": ["OPPORTUNITY"],
+        "completedJtbds": ["jtbd-capture-lead", "jtbd-qualify-opportunity"],
+        "currentPackId": "pack-customers"
+      },
+      "expected": {
+        "topPrediction": "jtbd-create-proposal",
+        "strategy": "BLUEPRINT",
+        "minConfidence": 0.9
+      }
+    },
+    {
+      "id": "artifact-flow",
+      "description": "Should suggest actions that consume recent artifacts",
+      "context": {
+        "activeBlueprints": {},
+        "recentlyProducedArtifacts": ["INVOICE"],
+        "completedJtbds": ["jtbd-issue-invoice"],
+        "currentPackId": "pack-money"
+      },
+      "expected": {
+        "topPrediction": "jtbd-collect-payment",
+        "strategy": "ARTIFACT_FLOW",
+        "minConfidence": 0.7
+      }
+    },
+    {
+      "id": "onboarding-empty",
+      "description": "Should suggest starter JTBDs for new users",
+      "context": {
+        "activeBlueprints": {},
+        "recentlyProducedArtifacts": [],
+        "completedJtbds": [],
+        "currentPackId": null
+      },
+      "expected": {
+        "strategy": "ONBOARDING",
+        "hasPredictions": true,
+        "starterJtbds": ["jtbd-capture-lead", "jtbd-issue-invoice", "jtbd-onboard-person"]
+      }
+    },
+    {
+      "id": "pack-affinity",
+      "description": "Should suggest from frequent pack when no other signals",
+      "context": {
+        "activeBlueprints": {},
+        "recentlyProducedArtifacts": [],
+        "completedJtbds": ["jtbd-issue-invoice", "jtbd-collect-payment", "jtbd-reconcile-books"],
+        "currentPackId": null,
+        "frequentPack": "pack-money"
+      },
+      "expected": {
+        "topPackId": "pack-money",
+        "strategy": "PACK_AFFINITY"
+      }
+    }
+  ],
+  "invariants": [
+    "predictions are always sorted by confidence descending",
+    "no duplicate jtbd IDs in predictions",
+    "confidence values are between 0 and 1",
+    "every prediction has a non-empty reason"
+  ]
+}
