@@ -25,13 +25,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import zone.converge.android.data.*
 import zone.converge.android.grpc.ConnectionState
 import zone.converge.android.grpc.RunStatusType
 import zone.converge.android.ml.*
 import zone.converge.android.ui.theme.ConvergeColors
-import zone.converge.android.ui.theme.ConvergeSpacing
 
 /**
  * Smart Action Screen - The main UI that shows the most likely action prominently.
@@ -96,7 +94,7 @@ fun SmartActionScreen(
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent,
-                )
+                ),
             )
         },
     ) { padding ->
@@ -202,10 +200,7 @@ fun SmartActionScreen(
  * Primary action card - large, prominent, one-tap.
  */
 @Composable
-fun PrimaryActionCard(
-    prediction: JTBDPrediction,
-    onClick: () -> Unit,
-) {
+fun PrimaryActionCard(prediction: JTBDPrediction, onClick: () -> Unit) {
     // Use theme colors for pack gradients
     val packColors = mapOf(
         "pack-money" to listOf(ConvergeColors.PackMoney, ConvergeColors.PackMoney.copy(alpha = 0.7f)),
@@ -229,7 +224,7 @@ fun PrimaryActionCard(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
-                    brush = Brush.linearGradient(colors)
+                    brush = Brush.linearGradient(colors),
                 )
                 .padding(24.dp),
         ) {
@@ -310,10 +305,7 @@ fun PrimaryActionCard(
  * Quick action chip for secondary predictions.
  */
 @Composable
-fun QuickActionChip(
-    prediction: JTBDPrediction,
-    onClick: () -> Unit,
-) {
+fun QuickActionChip(prediction: JTBDPrediction, onClick: () -> Unit) {
     Surface(
         modifier = Modifier
             .width(140.dp)
@@ -349,10 +341,7 @@ fun QuickActionChip(
  * Blueprint card for multi-step workflows.
  */
 @Composable
-fun BlueprintCard(
-    suggestion: BlueprintSuggestion,
-    onClick: () -> Unit,
-) {
+fun BlueprintCard(suggestion: BlueprintSuggestion, onClick: () -> Unit) {
     OutlinedCard(
         modifier = Modifier
             .fillMaxWidth()
@@ -386,11 +375,12 @@ fun BlueprintCard(
                                 .size(8.dp)
                                 .clip(CircleShape)
                                 .background(
-                                    if (jtbdId in suggestion.alreadyCompleted)
+                                    if (jtbdId in suggestion.alreadyCompleted) {
                                         MaterialTheme.colorScheme.primary
-                                    else
+                                    } else {
                                         MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-                                )
+                                    },
+                                ),
                         )
                     }
                 }
@@ -408,10 +398,7 @@ fun BlueprintCard(
  * Activity item for recent activity feed.
  */
 @Composable
-fun ActivityItem(
-    activity: ActivityRecord,
-    onClick: () -> Unit,
-) {
+fun ActivityItem(activity: ActivityRecord, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -526,7 +513,10 @@ data class ActivityRecord(
 )
 
 enum class ActivityType {
-    JOB_COMPLETED, ARTIFACT_CREATED, DECISION_PENDING, NOTIFICATION
+    JOB_COMPLETED,
+    ARTIFACT_CREATED,
+    DECISION_PENDING,
+    NOTIFICATION,
 }
 
 /**
@@ -547,7 +537,7 @@ fun ConnectionIndicator(state: ConnectionState) {
                 modifier = Modifier
                     .size(8.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFF4CAF50)) // Green
+                    .background(Color(0xFF4CAF50)), // Green
             )
         }
         ConnectionState.RECONNECTING -> {
@@ -555,7 +545,7 @@ fun ConnectionIndicator(state: ConnectionState) {
                 modifier = Modifier
                     .size(8.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFFFFEB3B)) // Yellow
+                    .background(Color(0xFFFFEB3B)), // Yellow
             )
         }
         ConnectionState.DEGRADED -> {
@@ -567,7 +557,7 @@ fun ConnectionIndicator(state: ConnectionState) {
                     modifier = Modifier
                         .size(8.dp)
                         .clip(CircleShape)
-                        .background(Color(0xFFFF9800)) // Orange
+                        .background(Color(0xFFFF9800)), // Orange
                 )
                 Text(
                     "Limited",
@@ -585,7 +575,7 @@ fun ConnectionIndicator(state: ConnectionState) {
                     modifier = Modifier
                         .size(8.dp)
                         .clip(CircleShape)
-                        .background(Color(0xFFF44336)) // Red
+                        .background(Color(0xFFF44336)), // Red
                 )
                 Text(
                     "Offline",
@@ -602,10 +592,7 @@ fun ConnectionIndicator(state: ConnectionState) {
  * Shows: HALT → EXPLAIN → offer RESTART
  */
 @Composable
-fun HaltExplanationBanner(
-    explanation: HaltExplanation,
-    onRetry: () -> Unit,
-) {
+fun HaltExplanationBanner(explanation: HaltExplanation, onRetry: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
@@ -664,9 +651,7 @@ fun HaltExplanationBanner(
  * Shows what the run is waiting for.
  */
 @Composable
-fun WaitingStatusBanner(
-    waitingFor: List<String>,
-) {
+fun WaitingStatusBanner(waitingFor: List<String>) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(

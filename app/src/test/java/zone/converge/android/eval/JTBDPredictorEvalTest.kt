@@ -5,7 +5,6 @@ package zone.converge.android.eval
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.BeforeEach
@@ -46,7 +45,7 @@ class JTBDPredictorEvalTest {
             // Given: Active blueprint with some steps completed
             val context = DomainContext(
                 activeBlueprints = mapOf(
-                    "blueprint-lead-to-cash" to setOf("jtbd-capture-lead", "jtbd-qualify-opportunity")
+                    "blueprint-lead-to-cash" to setOf("jtbd-capture-lead", "jtbd-qualify-opportunity"),
                 ),
                 recentlyProducedArtifacts = setOf(ArtifactType.OPPORTUNITY),
                 completedJtbds = setOf("jtbd-capture-lead", "jtbd-qualify-opportunity"),
@@ -154,7 +153,7 @@ class JTBDPredictorEvalTest {
         fun noDuplicates() = runTest {
             val context = DomainContext(
                 activeBlueprints = mapOf(
-                    "blueprint-lead-to-cash" to setOf("jtbd-capture-lead")
+                    "blueprint-lead-to-cash" to setOf("jtbd-capture-lead"),
                 ),
                 recentlyProducedArtifacts = setOf(ArtifactType.LEAD),
                 completedJtbds = setOf("jtbd-capture-lead"),

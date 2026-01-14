@@ -19,6 +19,7 @@ detekt {
 }
 
 // Spotless - format enforcement (kills bikeshedding)
+// Using ktlint with Android-compatible rules
 spotless {
     kotlin {
         target("**/*.kt")
@@ -28,14 +29,25 @@ spotless {
                 mapOf(
                     "indent_size" to "4",
                     "max_line_length" to "120",
+                    // Disabled rules that conflict with Android/Compose conventions:
                     "ktlint_standard_no-wildcard-imports" to "disabled",
-                )
+                    "ktlint_standard_value-argument-comment" to "disabled",
+                    "ktlint_standard_value-parameter-comment" to "disabled",
+                    "ktlint_standard_function-naming" to "disabled", // Compose uses PascalCase
+                    "ktlint_standard_property-naming" to "disabled", // _backing pattern is idiomatic
+                ),
             )
     }
     kotlinGradle {
         target("**/*.kts")
         targetExclude("**/build/**")
         ktlint("1.1.1")
+            .editorConfigOverride(
+                mapOf(
+                    "ktlint_standard_no-wildcard-imports" to "disabled",
+                    "ktlint_standard_value-argument-comment" to "disabled",
+                ),
+            )
     }
 }
 

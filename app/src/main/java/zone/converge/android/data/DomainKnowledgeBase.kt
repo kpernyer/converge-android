@@ -358,7 +358,12 @@ object DomainKnowledgeBase {
             ),
             steps = listOf(
                 FlowStep(id = "step-1", jtbdId = "jtbd-make-promise", condition = null, isOptional = false),
-                FlowStep(id = "step-2", jtbdId = "jtbd-onboard-person", condition = "requiresNewHire", isOptional = true),
+                FlowStep(
+                    id = "step-2",
+                    jtbdId = "jtbd-onboard-person",
+                    condition = "requiresNewHire",
+                    isOptional = true,
+                ),
             ),
         ),
         DomainFlow(
@@ -404,7 +409,12 @@ object DomainKnowledgeBase {
             ),
             steps = listOf(
                 FlowStep(id = "step-1", jtbdId = "jtbd-close-period", condition = null, isOptional = false),
-                FlowStep(id = "step-2", jtbdId = "jtbd-record-compliance", condition = "requiresCompliance", isOptional = true),
+                FlowStep(
+                    id = "step-2",
+                    jtbdId = "jtbd-record-compliance",
+                    condition = "requiresCompliance",
+                    isOptional = true,
+                ),
             ),
         ),
     )
@@ -421,8 +431,7 @@ object DomainKnowledgeBase {
 
     fun getFlow(id: String): DomainFlow? = flows.find { it.id == id }
 
-    fun getJTBDsForPack(packId: String): List<JTBD> =
-        jtbds.values.filter { it.packId == packId }
+    fun getJTBDsForPack(packId: String): List<JTBD> = jtbds.values.filter { it.packId == packId }
 
     fun getNextJTBDs(currentJtbdId: String): List<JTBD> {
         val current = jtbds[currentJtbdId] ?: return emptyList()
@@ -519,7 +528,7 @@ data class JTBD(
     val packId: String,
     val name: String,
     val verb: String,
-    val obj: String,  // "object" is reserved in Kotlin
+    val obj: String, // "object" is reserved in Kotlin
     val outcome: String,
     val prerequisites: List<String>,
     val nextSteps: List<String>,
@@ -567,7 +576,11 @@ data class FlowTrigger(
 )
 
 enum class TriggerEvent {
-    CREATED, COMPLETED, FAILED, APPROVED, REJECTED
+    CREATED,
+    COMPLETED,
+    FAILED,
+    APPROVED,
+    REJECTED,
 }
 
 data class FlowStep(
@@ -583,22 +596,41 @@ data class FlowStep(
  */
 enum class ArtifactType {
     // Money Pack
-    INVOICE, PAYMENT, RECONCILIATION, PERIOD_CLOSE,
+    INVOICE,
+    PAYMENT,
+    RECONCILIATION,
+    PERIOD_CLOSE,
 
     // Customers Pack
-    LEAD, OPPORTUNITY, PROPOSAL, CONTRACT, DEAL,
+    LEAD,
+    OPPORTUNITY,
+    PROPOSAL,
+    CONTRACT,
+    DEAL,
 
     // Delivery Pack
-    PROMISE, WORK_ITEM, BLOCKER, ACCEPTANCE, POST_MORTEM,
+    PROMISE,
+    WORK_ITEM,
+    BLOCKER,
+    ACCEPTANCE,
+    POST_MORTEM,
 
     // People Pack
-    EMPLOYEE, CONTRACTOR, ACCESS_GRANT, PAYROLL_RUN,
+    EMPLOYEE,
+    CONTRACTOR,
+    ACCESS_GRANT,
+    PAYROLL_RUN,
 
     // Trust Pack
-    AUDIT_ENTRY, COMPLIANCE_RECORD,
+    AUDIT_ENTRY,
+    COMPLIANCE_RECORD,
 
     // Generic
-    SIGNAL, STRATEGY, EVALUATION, DECISION;
+    SIGNAL,
+    STRATEGY,
+    EVALUATION,
+    DECISION,
+    ;
 
     val displayName: String get() = when (this) {
         INVOICE -> "Invoice"

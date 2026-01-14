@@ -7,7 +7,6 @@ import app.cash.paparazzi.DeviceConfig
 import app.cash.paparazzi.Paparazzi
 import org.junit.Rule
 import org.junit.Test
-import zone.converge.android.data.ArtifactType
 import zone.converge.android.data.DomainKnowledgeBase
 import zone.converge.android.ml.BlueprintSuggestion
 import zone.converge.android.ml.JTBDPrediction

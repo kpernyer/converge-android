@@ -30,26 +30,26 @@ import androidx.core.view.WindowCompat
 // -----------------------------------------------------------------------------
 object ConvergeColors {
     // Core palette
-    val Paper = Color(0xFFF5F4F0)        // --paper: background/lightest
-    val Ink = Color(0xFF111111)           // --ink: primary text
-    val InkSecondary = Color(0xFF3A3A3A)  // --ink-secondary
-    val InkMuted = Color(0xFF666666)      // --ink-muted
+    val Paper = Color(0xFFF5F4F0) // --paper: background/lightest
+    val Ink = Color(0xFF111111) // --ink: primary text
+    val InkSecondary = Color(0xFF3A3A3A) // --ink-secondary
+    val InkMuted = Color(0xFF666666) // --ink-muted
 
     // Structural colors
-    val Rule = Color(0xFFC8C6C0)          // --rule: borders, dividers
-    val RuleLight = Color(0xFFDBD9D3)     // --rule-light
-    val Surface = Color(0xFFEAE9E4)       // --surface: cards, hover
-    val SurfaceHover = Color(0xFFE0DFDA)  // --surface-hover
+    val Rule = Color(0xFFC8C6C0) // --rule: borders, dividers
+    val RuleLight = Color(0xFFDBD9D3) // --rule-light
+    val Surface = Color(0xFFEAE9E4) // --surface: cards, hover
+    val SurfaceHover = Color(0xFFE0DFDA) // --surface-hover
 
     // Accent - Converge Green
-    val Accent = Color(0xFF2D5A3D)        // --accent: primary brand color
-    val AccentLight = Color(0xFF3D7A5D)   // --accent-light
-    val AccentDark = Color(0xFF244A31)    // button hover
+    val Accent = Color(0xFF2D5A3D) // --accent: primary brand color
+    val AccentLight = Color(0xFF3D7A5D) // --accent-light
+    val AccentDark = Color(0xFF244A31) // button hover
 
     // Status colors
-    val Success = Color(0xFF2D5A3D)       // --status-success (same as accent)
-    val Warning = Color(0xFF6B5B3D)       // --status-warning (brown/tan)
-    val Error = Color(0xFF5A3D3D)         // --status-error (dark red)
+    val Success = Color(0xFF2D5A3D) // --status-success (same as accent)
+    val Warning = Color(0xFF6B5B3D) // --status-warning (brown/tan)
+    val Error = Color(0xFF5A3D3D) // --status-error (dark red)
 
     // Pack colors (for domain areas)
     val PackMoney = Color(0xFF2E7D32)
@@ -78,19 +78,19 @@ object ConvergeColorsDark {
 // Spacing - 4dp base unit (from converge-www)
 // -----------------------------------------------------------------------------
 object ConvergeSpacing {
-    val Space1 = 4.dp     // --space-1: 0.25rem
-    val Space2 = 8.dp     // --space-2: 0.5rem
-    val Space3 = 12.dp    // --space-3: 0.75rem
-    val Space4 = 16.dp    // --space-4: 1rem
-    val Space5 = 20.dp    // --space-5: 1.25rem
-    val Space6 = 24.dp    // --space-6: 1.5rem
-    val Space8 = 32.dp    // --space-8: 2rem
-    val Space10 = 40.dp   // --space-10: 2.5rem
-    val Space12 = 48.dp   // --space-12: 3rem
-    val Space16 = 64.dp   // --space-16: 4rem
-    val Space20 = 80.dp   // --space-20: 5rem
+    val Space1 = 4.dp // --space-1: 0.25rem
+    val Space2 = 8.dp // --space-2: 0.5rem
+    val Space3 = 12.dp // --space-3: 0.75rem
+    val Space4 = 16.dp // --space-4: 1rem
+    val Space5 = 20.dp // --space-5: 1.25rem
+    val Space6 = 24.dp // --space-6: 1.5rem
+    val Space8 = 32.dp // --space-8: 2rem
+    val Space10 = 40.dp // --space-10: 2.5rem
+    val Space12 = 48.dp // --space-12: 3rem
+    val Space16 = 64.dp // --space-16: 4rem
+    val Space20 = 80.dp // --space-20: 5rem
 
-    val HeaderHeight = 56.dp  // --header-height: 3.5rem
+    val HeaderHeight = 56.dp // --header-height: 3.5rem
 }
 
 // -----------------------------------------------------------------------------
@@ -104,19 +104,19 @@ val ConvergeTypography = Typography(
     displayLarge = TextStyle(
         fontFamily = FontFamily.Monospace,
         fontWeight = FontWeight.SemiBold,
-        fontSize = 40.sp,  // --text-4xl
+        fontSize = 40.sp, // --text-4xl
         lineHeight = 52.sp,
     ),
     displayMedium = TextStyle(
         fontFamily = FontFamily.Monospace,
         fontWeight = FontWeight.SemiBold,
-        fontSize = 32.sp,  // --text-3xl
+        fontSize = 32.sp, // --text-3xl
         lineHeight = 42.sp,
     ),
     displaySmall = TextStyle(
         fontFamily = FontFamily.Monospace,
         fontWeight = FontWeight.SemiBold,
-        fontSize = 24.sp,  // --text-2xl
+        fontSize = 24.sp, // --text-2xl
         lineHeight = 32.sp,
     ),
 
@@ -124,19 +124,19 @@ val ConvergeTypography = Typography(
     headlineLarge = TextStyle(
         fontFamily = FontFamily.Monospace,
         fontWeight = FontWeight.SemiBold,
-        fontSize = 20.sp,  // --text-xl
+        fontSize = 20.sp, // --text-xl
         lineHeight = 26.sp,
     ),
     headlineMedium = TextStyle(
         fontFamily = FontFamily.Monospace,
         fontWeight = FontWeight.SemiBold,
-        fontSize = 18.sp,  // --text-lg
+        fontSize = 18.sp, // --text-lg
         lineHeight = 24.sp,
     ),
     headlineSmall = TextStyle(
         fontFamily = FontFamily.Monospace,
         fontWeight = FontWeight.SemiBold,
-        fontSize = 16.sp,  // --text-md
+        fontSize = 16.sp, // --text-md
         lineHeight = 22.sp,
     ),
 
@@ -156,7 +156,7 @@ val ConvergeTypography = Typography(
     titleSmall = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Medium,
-        fontSize = 14.sp,  // --text-base
+        fontSize = 14.sp, // --text-base
         lineHeight = 21.sp,
     ),
 
@@ -164,19 +164,19 @@ val ConvergeTypography = Typography(
     bodyLarge = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,  // --text-md
+        fontSize = 16.sp, // --text-md
         lineHeight = 24.sp,
     ),
     bodyMedium = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Normal,
-        fontSize = 14.sp,  // --text-base
+        fontSize = 14.sp, // --text-base
         lineHeight = 21.sp,
     ),
     bodySmall = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Normal,
-        fontSize = 12.sp,  // --text-sm
+        fontSize = 12.sp, // --text-sm
         lineHeight = 18.sp,
     ),
 
@@ -196,7 +196,7 @@ val ConvergeTypography = Typography(
     labelSmall = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Medium,
-        fontSize = 10.sp,  // --text-xs
+        fontSize = 10.sp, // --text-xs
         lineHeight = 14.sp,
     ),
 )
@@ -275,8 +275,11 @@ fun ConvergeTheme(
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context)
-            else dynamicLightColorScheme(context)
+            if (darkTheme) {
+                dynamicDarkColorScheme(context)
+            } else {
+                dynamicLightColorScheme(context)
+            }
         }
         darkTheme -> DarkColorScheme
         else -> LightColorScheme

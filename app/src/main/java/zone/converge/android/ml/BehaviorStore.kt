@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.time.Instant
 
 /**
  * Persists user behavior patterns for action prediction learning.
@@ -53,25 +52,27 @@ class BehaviorStore(context: Context) {
      * Get action transition probabilities.
      * Returns P(next_action | current_action)
      */
-    suspend fun getTransitionProbabilities(currentAction: String): Map<String, Float> =
-        withContext(Dispatchers.IO) {
-            val sequences = prefs.getString("action_sequences", null) ?: return@withContext emptyMap()
-            val counts = mutableMapOf<String, Int>()
-            var total = 0
+    suspend fun getTransitionProbabilities(currentAction: String): Map<String, Float> = withContext(Dispatchers.IO) {
+        val sequences = prefs.getString("action_sequences", null) ?: return@withContext emptyMap()
+        val counts = mutableMapOf<String, Int>()
+        var total = 0
 
-            sequences.split(";").forEach { seq ->
-                val parts = seq.split("->")
-                if (parts.size == 2 && parts[0] == currentAction) {
-                    val next = parts[1].substringBefore(":")
-                    val count = parts[1].substringAfter(":").toIntOrNull() ?: 1
-                    counts[next] = (counts[next] ?: 0) + count
-                    total += count
-                }
+        sequences.split(";").forEach { seq ->
+            val parts = seq.split("->")
+            if (parts.size == 2 && parts[0] == currentAction) {
+                val next = parts[1].substringBefore(":")
+                val count = parts[1].substringAfter(":").toIntOrNull() ?: 1
+                counts[next] = (counts[next] ?: 0) + count
+                total += count
             }
-
-            if (total == 0) emptyMap()
-            else counts.mapValues { it.value.toFloat() / total }
         }
+
+        if (total == 0) {
+            emptyMap()
+        } else {
+            counts.mapValues { it.value.toFloat() / total }
+        }
+    }
 
     /**
      * Get hour-of-day action distribution.

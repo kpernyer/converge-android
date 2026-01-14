@@ -85,7 +85,7 @@ class ConvergeApp : Application() {
                 SentryTimberIntegration(
                     minEventLevel = io.sentry.SentryLevel.ERROR,
                     minBreadcrumbLevel = io.sentry.SentryLevel.INFO,
-                )
+                ),
             )
         }
     }
@@ -97,7 +97,7 @@ class ConvergeApp : Application() {
                 .detectDiskWrites()
                 .detectNetwork()
                 .penaltyLog()
-                .build()
+                .build(),
         )
 
         StrictMode.setVmPolicy(
@@ -106,7 +106,7 @@ class ConvergeApp : Application() {
                 .detectLeakedClosableObjects()
                 .detectActivityLeaks()
                 .penaltyLog()
-                .build()
+                .build(),
         )
 
         Timber.d("StrictMode enabled")

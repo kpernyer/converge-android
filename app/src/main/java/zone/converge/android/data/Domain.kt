@@ -88,15 +88,13 @@ data class UserDomainPreferences(
         frequentJTBDs.merge(jtbdId, 1) { a, b -> a + b }
     }
 
-    fun topPacks(limit: Int = 3): List<String> =
-        frequentPacks.entries
-            .sortedByDescending { it.value }
-            .take(limit)
-            .map { it.key }
+    fun topPacks(limit: Int = 3): List<String> = frequentPacks.entries
+        .sortedByDescending { it.value }
+        .take(limit)
+        .map { it.key }
 
-    fun topJTBDs(limit: Int = 5): List<String> =
-        frequentJTBDs.entries
-            .sortedByDescending { it.value }
-            .take(limit)
-            .map { it.key }
+    fun topJTBDs(limit: Int = 5): List<String> = frequentJTBDs.entries
+        .sortedByDescending { it.value }
+        .take(limit)
+        .map { it.key }
 }

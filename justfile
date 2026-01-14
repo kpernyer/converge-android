@@ -1,6 +1,9 @@
 # Converge Android - Development Commands
 # Install just: brew install just (macOS) or cargo install just
 
+# Java 17 required by AGP 8.x - set JAVA_HOME for all recipes
+export JAVA_HOME := "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home"
+
 # Default: show available commands
 default:
     @just --list

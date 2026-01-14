@@ -6,7 +6,6 @@ package zone.converge.android.ml
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import zone.converge.android.data.*
-import java.time.Instant
 
 /**
  * JTBD Predictor - Predicts the user's next Job To Be Done.
@@ -41,7 +40,7 @@ class JTBDPredictor(
                         confidence = 0.95f,
                         reason = "Continue ${DomainKnowledgeBase.getBlueprint(blueprintId)?.name}",
                         strategy = PredictionStrategy.BLUEPRINT,
-                    )
+                    ),
                 )
             }
         }
@@ -54,9 +53,12 @@ class JTBDPredictor(
                     JTBDPrediction(
                         jtbd = jtbd,
                         confidence = 0.85f - (idx * 0.1f),
-                        reason = "Uses your recent ${context.recentlyProducedArtifacts.first().name.lowercase().replace('_', ' ')}",
+                        reason = "Uses your recent ${context.recentlyProducedArtifacts.first().name.lowercase().replace(
+                            '_',
+                            ' ',
+                        )}",
                         strategy = PredictionStrategy.ARTIFACT_FLOW,
-                    )
+                    ),
                 )
             }
         }
@@ -72,7 +74,7 @@ class JTBDPredictor(
                             confidence = 0.7f,
                             reason = "You do this often",
                             strategy = PredictionStrategy.FREQUENCY,
-                        )
+                        ),
                     )
                 }
             }
@@ -92,7 +94,7 @@ class JTBDPredictor(
                             confidence = 0.5f,
                             reason = "From your frequent ${DomainKnowledgeBase.getPack(topPack)?.name} pack",
                             strategy = PredictionStrategy.PACK_AFFINITY,
-                        )
+                        ),
                     )
                 }
         }
@@ -107,7 +109,7 @@ class JTBDPredictor(
                         confidence = 0.3f,
                         reason = "Get started",
                         strategy = PredictionStrategy.ONBOARDING,
-                    )
+                    ),
                 )
             }
         }
@@ -138,7 +140,7 @@ class JTBDPredictor(
                         confidence = 0.6f + (progress * 0.3f),
                         reason = "You've completed ${matchingJtbds.size}/${blueprint.jtbdSequence.size} steps",
                         alreadyCompleted = matchingJtbds.toSet(),
-                    )
+                    ),
                 )
             }
         }
@@ -156,7 +158,7 @@ class JTBDPredictor(
                             confidence = 0.4f,
                             reason = "Matches your ${DomainKnowledgeBase.getPack(topPack)?.name} focus",
                             alreadyCompleted = emptySet(),
-                        )
+                        ),
                     )
                 }
         }
@@ -241,18 +243,16 @@ class OutcomeTracker(
     /**
      * Get frequently completed JTBDs.
      */
-    fun getFrequentJTBDs(): List<Pair<String, Int>> =
-        jtbdCompletions.entries
-            .sortedByDescending { it.value }
-            .map { it.key to it.value }
+    fun getFrequentJTBDs(): List<Pair<String, Int>> = jtbdCompletions.entries
+        .sortedByDescending { it.value }
+        .map { it.key to it.value }
 
     /**
      * Get the most frequently used pack.
      */
-    fun getTopPack(): String? =
-        packCompletions.entries
-            .maxByOrNull { it.value }
-            ?.key
+    fun getTopPack(): String? = packCompletions.entries
+        .maxByOrNull { it.value }
+        ?.key
 
     /**
      * Get artifact production counts.

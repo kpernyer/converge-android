@@ -6,7 +6,6 @@ package zone.converge.android.grpc
 import android.util.Log
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
-import io.grpc.stub.StreamObserver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
@@ -43,10 +42,10 @@ enum class ConnectionState {
  * A run is not a request. It is a convergence process.
  */
 enum class RunStatusType {
-    RUNNING,     // Truths still firing, facts still arriving
-    CONVERGED,   // Stable state reached, no more truths to fire
-    HALTED,      // Invariant violated, explanation available
-    WAITING,     // Blocked on external input (human approval, etc.)
+    RUNNING, // Truths still firing, facts still arriving
+    CONVERGED, // Stable state reached, no more truths to fire
+    HALTED, // Invariant violated, explanation available
+    WAITING, // Blocked on external input (human approval, etc.)
 }
 
 /**
@@ -266,15 +265,12 @@ class ConvergeClient(
     /**
      * Load a context from a snapshot per contract §14.1
      */
-    suspend fun loadContext(
-        contextId: String,
-        snapshot: ByteArray,
-        failIfExists: Boolean = false,
-    ): Long = withContext(Dispatchers.IO) {
-        val ch = requireChannel()
-        Log.d(TAG, "Loading snapshot into: $contextId")
-        0L
-    }
+    suspend fun loadContext(contextId: String, snapshot: ByteArray, failIfExists: Boolean = false): Long =
+        withContext(Dispatchers.IO) {
+            val ch = requireChannel()
+            Log.d(TAG, "Loading snapshot into: $contextId")
+            0L
+        }
 
     /**
      * Generate idempotency key per contract §16.1
@@ -303,10 +299,10 @@ class ConvergeClient(
  * Entry type per contract §4.2 and §14.2
  */
 enum class EntryType {
-    FACT,       // Accepted truth, now in context
-    PROPOSAL,   // Suggested change, pending
-    TRACE,      // Audit record
-    DECISION,   // Invariant check result
+    FACT, // Accepted truth, now in context
+    PROPOSAL, // Suggested change, pending
+    TRACE, // Audit record
+    DECISION, // Invariant check result
 }
 
 /**

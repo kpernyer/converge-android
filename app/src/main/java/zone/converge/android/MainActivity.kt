@@ -47,7 +47,7 @@ class MainActivity : ComponentActivity() {
                     SmartActionScreen(
                         viewModel = viewModel,
                         onExecuteJTBD = { jtbd ->
-                            viewModel.executeJTBD(jtbd)
+                            viewModel.submitProposal(jtbd)
                         },
                         onStartBlueprint = { blueprint ->
                             viewModel.startBlueprint(blueprint)

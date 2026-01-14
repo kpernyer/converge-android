@@ -12,7 +12,6 @@ import kotlinx.coroutines.launch
 import zone.converge.android.data.*
 import zone.converge.android.grpc.ConnectionState
 import zone.converge.android.grpc.ConvergeClient
-import zone.converge.android.grpc.EntryType
 import zone.converge.android.grpc.RunStatus
 import zone.converge.android.grpc.RunStatusType
 import zone.converge.android.ml.*
@@ -49,7 +48,7 @@ class SmartActionViewModel(
             recentlyProducedArtifacts = emptySet(),
             completedJtbds = emptySet(),
             currentPackId = null,
-        )
+        ),
     )
 
     // Connection state from client per contract §1.5

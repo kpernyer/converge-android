@@ -4,10 +4,8 @@
 package zone.converge.android.ml
 
 import android.content.Context
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import org.tensorflow.lite.Interpreter
 import zone.converge.android.data.*
 import java.nio.ByteBuffer
@@ -15,7 +13,6 @@ import java.nio.ByteOrder
 import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDateTime
-import java.time.ZoneId
 
 /**
  * Smart Action Prediction Layer
@@ -84,7 +81,7 @@ class ActionPredictor(
                 timestamp = Instant.now(),
                 contextHash = context.hashCode(),
                 features = extractFeatures(context),
-            )
+            ),
         )
     }
 
@@ -104,7 +101,7 @@ class ActionPredictor(
         features[idx++] = now.dayOfMonth / 31f
         features[idx++] = now.monthValue / 12f
         features[idx++] = if (now.hour in 9..17) 1f else 0f // Work hours
-        features[idx++] = if (now.hour in 6..9) 1f else 0f   // Morning
+        features[idx++] = if (now.hour in 6..9) 1f else 0f // Morning
 
         // Job status features (8 features)
         val jobs = ctx.activeJobs
@@ -256,7 +253,7 @@ class ActionPredictor(
                                     confidence = baseScore * (1f - i * 0.1f),
                                     reason = "Job: ${job.title}",
                                     category = ActionCategory.JOBS,
-                                )
+                                ),
                             )
                         }
                 }
@@ -268,7 +265,7 @@ class ActionPredictor(
                                 confidence = baseScore,
                                 reason = "Decision pending: ${decision.title}",
                                 category = ActionCategory.DECISIONS,
-                            )
+                            ),
                         )
                     }
                 }
@@ -280,7 +277,7 @@ class ActionPredictor(
                                 confidence = baseScore,
                                 reason = "New: ${artifact.title}",
                                 category = ActionCategory.ARTIFACTS,
-                            )
+                            ),
                         )
                     }
                 }
@@ -292,7 +289,7 @@ class ActionPredictor(
                                 confidence = baseScore,
                                 reason = "Start: ${template.name}",
                                 category = ActionCategory.CREATE,
-                            )
+                            ),
                         )
                     }
                 }
@@ -304,7 +301,7 @@ class ActionPredictor(
                                 confidence = baseScore,
                                 reason = "${ctx.unreadNotifications} unread",
                                 category = ActionCategory.SYSTEM,
-                            )
+                            ),
                         )
                     }
                 }
@@ -316,7 +313,7 @@ class ActionPredictor(
                                 confidence = baseScore * 0.5f,
                                 reason = pack.name,
                                 category = ActionCategory.NAVIGATION,
-                            )
+                            ),
                         )
                     }
                 }
@@ -328,7 +325,7 @@ class ActionPredictor(
                                 confidence = baseScore,
                                 reason = "Export: ${artifact.title}",
                                 category = ActionCategory.ARTIFACTS,
-                            )
+                            ),
                         )
                     }
                 }
@@ -339,7 +336,7 @@ class ActionPredictor(
                             confidence = 0.1f,
                             reason = "Refresh data",
                             category = ActionCategory.SYSTEM,
-                        )
+                        ),
                     )
                 }
                 ActionType.OPEN_SETTINGS -> {
@@ -349,7 +346,7 @@ class ActionPredictor(
                             confidence = 0.05f,
                             reason = "Settings",
                             category = ActionCategory.SYSTEM,
-                        )
+                        ),
                     )
                 }
             }
@@ -423,7 +420,12 @@ enum class ActionType {
 }
 
 enum class ActionCategory {
-    JOBS, ARTIFACTS, DECISIONS, CREATE, NAVIGATION, SYSTEM
+    JOBS,
+    ARTIFACTS,
+    DECISIONS,
+    CREATE,
+    NAVIGATION,
+    SYSTEM,
 }
 
 /**
