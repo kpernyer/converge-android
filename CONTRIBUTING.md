@@ -53,7 +53,7 @@ Use conventional commits:
 ## Domain Model Changes
 
 When modifying domain models (`DomainKnowledgeBase.kt`, `Domain.kt`):
-- Ensure consistency with iOS app ([converge-mobile](https://github.com/kpernyer/converge-mobile))
+- Ensure consistency with iOS app ([converge-ios](https://github.com/kpernyer/converge-ios))
 - Follow ID conventions: `pack-`, `jtbd-`, `blueprint-`, `flow-`
 - Update related documentation
 

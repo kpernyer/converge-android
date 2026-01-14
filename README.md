@@ -8,7 +8,7 @@ A smart action prediction mobile app built with Kotlin and Jetpack Compose, conn
 - **Domain-Aware JTBD System**: Learns about Jobs To Be Done, Packs, Blueprints, and Artifacts
 - **One-Tap Actions**: Minimizes clicks to reach desired outcomes
 - **gRPC Streaming**: Bidirectional communication with converge-runtime via HTTP/2
-- **Cross-Platform Consistency**: Domain model aligned with [converge-mobile](https://github.com/kpernyer/converge-mobile) (iOS)
+- **Cross-Platform Consistency**: Domain model aligned with [converge-ios](https://github.com/kpernyer/converge-ios) (iOS)
 
 ## Architecture
 
@@ -122,7 +122,7 @@ app/src/main/java/zone/converge/android/
 ## Related Projects
 
 - [converge-runtime](https://github.com/kpernyer/converge-runtime) - Backend runtime (Rust)
-- [converge-mobile](https://github.com/kpernyer/converge-mobile) - iOS app (Swift/SwiftUI)
+- [converge-ios](https://github.com/kpernyer/converge-ios) - iOS app (Swift/SwiftUI)
 - [converge-www](https://github.com/kpernyer/converge-www) - Web platform (React)
 - [converge-domain](https://github.com/kpernyer/converge-domain) - Domain documentation
 
