@@ -1,6 +1,10 @@
-# Converge Android
+# Converge: Semantic Governance & Alignment
 
-A smart action prediction mobile app built with Kotlin and Jetpack Compose, connecting to [converge-runtime](https://github.com/kpernyer/converge-runtime).
+> Converge is a vision for **semantic governance**. We move from fragmented intent to unified, converged states through a deterministic alignment engine. Our mission is to provide a stable foundation for complex decision-making where human authority and AI agency coexist in a transparent, explainable ecosystem.
+
+## Converge Android
+
+A smart action prediction mobile app built with Kotlin and Jetpack Compose, connecting to [converge-runtime](../converge-runtime).
 
 ## Features
 
@@ -12,7 +16,7 @@ A smart action prediction mobile app built with Kotlin and Jetpack Compose, conn
 
 ## Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                    Smart Action Screen                       │
 │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────┐ │
@@ -37,6 +41,7 @@ A smart action prediction mobile app built with Kotlin and Jetpack Compose, conn
 ## Domain Model
 
 ### 5 Core Packs
+
 - **Money**: Financial operations (invoicing, payments, reconciliation)
 - **Customers**: Revenue generation (leads, opportunities, deals)
 - **Delivery**: Value delivery (promises, work items, acceptance)
@@ -44,6 +49,7 @@ A smart action prediction mobile app built with Kotlin and Jetpack Compose, conn
 - **Trust**: Governance (audit trails, compliance, risk)
 
 ### Prediction Strategies
+
 1. **Blueprint-driven**: Continue active multi-step workflows
 2. **Artifact flow**: Suggest actions that use recently produced outputs
 3. **Frequency-based**: Learn from user patterns
@@ -63,12 +69,12 @@ A smart action prediction mobile app built with Kotlin and Jetpack Compose, conn
 
 The app uses the Converge design system from the web platform:
 
-| Token | Value | Usage |
-|-------|-------|-------|
-| Paper | `#f5f4f0` | Background |
-| Ink | `#111111` | Primary text |
-| Accent | `#2d5a3d` | Brand green |
-| Surface | `#eae9e4` | Cards, hover states |
+| Token   | Value       | Usage               |
+| ------- | ----------- | ------------------- |
+| Paper   | `#f5f4f0`   | Background          |
+| Ink     | `#111111`   | Primary text        |
+| Accent  | `#2d5a3d`   | Brand green         |
+| Surface | `#eae9e4`   | Cards, hover states |
 
 Typography uses monospace fonts for headings and sans-serif for body text.
 
@@ -101,7 +107,7 @@ adb shell am start -n zone.converge.android/.MainActivity
 
 ## Project Structure
 
-```
+```text
 app/src/main/java/zone/converge/android/
 ├── data/
 │   ├── Domain.kt                 # Runtime types (Job, Action, etc.)
@@ -118,6 +124,13 @@ app/src/main/java/zone/converge/android/
     └── theme/
         └── Theme.kt              # Converge design system
 ```
+
+## Documentation
+
+- **Knowledgebase:** See [converge-business/knowledgebase/](../converge-business/knowledgebase/)
+- **Cross-Platform Contract:** See [converge-business/knowledgebase/android-CROSS_PLATFORM_CONTRACT.md](../converge-business/knowledgebase/android-CROSS_PLATFORM_CONTRACT.md)
+- **Collaboration:** See [COLLABORATION.md](COLLABORATION.md)
+- **For LLMs:** See [AGENTS.md](AGENTS.md)
 
 ## Related Projects
 
