@@ -8,6 +8,7 @@ import android.os.StrictMode
 import io.sentry.android.core.SentryAndroid
 import io.sentry.android.timber.SentryTimberIntegration
 import timber.log.Timber
+import zone.converge.android.data.SettingsRepository
 import zone.converge.android.grpc.ConvergeClient
 import zone.converge.android.ml.*
 
@@ -38,6 +39,9 @@ class ConvergeApp : Application() {
     lateinit var jtbdPredictor: JTBDPredictor
         private set
 
+    lateinit var settingsRepository: SettingsRepository
+        private set
+
     override fun onCreate() {
         super.onCreate()
 
@@ -50,6 +54,9 @@ class ConvergeApp : Application() {
         }
 
         Timber.d("Converge starting...")
+
+        // Initialize settings first (other components may depend on it)
+        settingsRepository = SettingsRepository(this)
 
         // Initialize stores
         behaviorStore = BehaviorStore(this)
