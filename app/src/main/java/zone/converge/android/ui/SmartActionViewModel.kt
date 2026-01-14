@@ -68,6 +68,10 @@ class SmartActionViewModel(
     private val _haltExplanation = MutableStateFlow<HaltExplanation?>(null)
     val haltExplanation = _haltExplanation.asStateFlow()
 
+    // Selected pack for navigation drawer
+    private val _selectedPackId = MutableStateFlow<String?>(null)
+    val selectedPackId = _selectedPackId.asStateFlow()
+
     init {
         refreshProposals()
     }
@@ -208,6 +212,17 @@ class SmartActionViewModel(
             )
             refreshProposals()
         }
+    }
+
+    /**
+     * Select a pack from navigation drawer.
+     * Updates context to influence predictions toward the selected domain.
+     */
+    fun selectPack(packId: String?) {
+        _selectedPackId.value = packId
+        val currentContext = _domainContext.value
+        _domainContext.value = currentContext.copy(currentPackId = packId)
+        refreshProposals()
     }
 
     /**
