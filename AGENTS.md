@@ -80,3 +80,46 @@ For full workflow details: `bd prime`
 - NEVER stop before pushing - that leaves work stranded locally
 - NEVER say "ready to push when you are" - YOU must push
 - If push fails, resolve and retry until it succeeds
+
+## Beads Tips (Local Repo Workflow)
+
+When using `bd` in this repo, note these gotchas:
+
+### Creating Issues Locally
+
+Always use `--repo .` to target this repo (otherwise issues may route to `~/.beads-planning`):
+
+```bash
+bd create "My task" --type task --repo .
+bd create "My feature" --type feature --priority 2 --repo .
+```
+
+### After Fresh Clone
+
+If `bd create` fails with "issue_prefix config is missing":
+
+```bash
+bd config set issue-prefix <repo-name>
+# e.g., bd config set issue-prefix converge-analytics
+```
+
+### First Push with jj
+
+Before first push, track the remote bookmark:
+
+```bash
+jj bookmark track main --remote=origin
+jj git push --bookmark main
+```
+
+### Quick Reference
+
+```bash
+bd ready                    # See unblocked work
+bd create "..." --repo .    # Create issue locally
+bd close <id>              # Close completed work
+bd sync                    # Sync to JSONL
+jj commit -m "..."         # Commit changes
+jj bookmark set main -r @- # Move main to parent
+jj git push --bookmark main # Push
+```
