@@ -17,11 +17,27 @@ This repository contains the **Android mobile application** for Converge.
 - **MVVM Architecture**: Strict separation of concerns between UI, ViewModel, and Domain.
 - **State Management**: Use `StateFlow` and `collectAsStateWithLifecycle`.
 - **UI Consistency**: Follow the Converge Design System (colors, typography).
-- **Cross-Platform**: Adhere to the [android-CROSS_PLATFORM_CONTRACT.md](../converge-business/knowledgebase/android-CROSS_PLATFORM_CONTRACT.md).
+- **Cross-Platform**: Adhere to the [android-CROSS_PLATFORM_CONTRACT.md](../converge-business/knowledgebase/archive/android-CROSS_PLATFORM_CONTRACT.md).
 
 ---
 
 ## Consolidated Documentation (converge-business)
 
-- **Knowledgebase**: [converge-business/knowledgebase/](../converge-business/knowledgebase/)
-- **Cross-Platform Contract**: [converge-business/knowledgebase/android-CROSS_PLATFORM_CONTRACT.md](../converge-business/knowledgebase/android-CROSS_PLATFORM_CONTRACT.md)
+- **Knowledgebase**: [converge-business/knowledgebase/](../converge-business/knowledgebase/consolidated/00_index.md)
+- **Cross-Platform Contract**: [converge-business/knowledgebase/android-CROSS_PLATFORM_CONTRACT.md](../converge-business/knowledgebase/archive/android-CROSS_PLATFORM_CONTRACT.md)
+
+## Version Control
+
+Use **Jujutsu (jj)** instead of git for version control operations:
+
+- `jj status` instead of `git status`
+- `jj log` instead of `git log`  
+- `jj diff` instead of `git diff`
+- `jj commit -m "message"` instead of `git add . && git commit -m "message"`
+- `jj git push` instead of `git push`
+- `jj git fetch` instead of `git fetch`
+- `jj undo` to undo the last operation
+
+All repos have jj initialized in colocated mode (works alongside git).
+
+
